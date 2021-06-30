@@ -56,11 +56,11 @@ func (runtime *Runtime) Run(containerNamePrefix string, workpackage string, site
 		},
 	}
 	container, err := runtime.client.CreateContainer(containerOpts)
-	if err == nil && container != nil {
+	if err == nil {
 		err = runtime.client.StartContainerWithContext(container.ID, nil, runtime.context)
 	}
 
-	if err == nil && container != nil {
+	if err == nil {
 		logOpts := docker.LogsOptions{
 			Stdout:       true,
 			Stderr:       true,
