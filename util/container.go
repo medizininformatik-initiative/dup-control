@@ -57,6 +57,7 @@ func (runtime *Runtime) Run(containerNamePrefix string, workpackage string, site
 	}
 	container, err := runtime.client.CreateContainer(containerOpts)
 	if err == nil {
+		defer runtime.remove(container)
 		err = runtime.client.StartContainerWithContext(container.ID, nil, runtime.context)
 	}
 
@@ -72,15 +73,15 @@ func (runtime *Runtime) Run(containerNamePrefix string, workpackage string, site
 		err = runtime.client.Logs(logOpts)
 	}
 
-	if container != nil {
-		removeOpts := docker.RemoveContainerOptions{
-			Context: runtime.context,
-			ID:      container.ID,
-		}
-		if removeErr := runtime.client.RemoveContainer(removeOpts); removeErr != nil {
-			log.Errorf("Unable to remove container with ID %s, %v", container.ID, removeErr.Error())
-		}
-	}
-
 	return err
+}
+
+func (runtime *Runtime) remove(container *docker.Container) {
+	removeOpts := docker.RemoveContainerOptions{
+		Context: runtime.context,
+		ID:      container.ID,
+	}
+	if err := runtime.client.RemoveContainer(removeOpts); err != nil {
+		log.Errorf("Unable to remove container with ID %s, %v", container.ID, err.Error())
+	}
 }
