@@ -37,27 +37,45 @@ func sprintImageName(workpackage string, site string) string {
 	return fmt.Sprintf("%s:%s", sprintRepositoryName(workpackage), site)
 }
 
-func sprintContainerName(containerNamePrefix string, workpackage string, site string) string {
-	return fmt.Sprintf("polar-%s-%s-%s", containerNamePrefix, workpackage, site)
+func sprintContainerName(prefix string, workpackage string, site string) string {
+	return fmt.Sprintf("polar-%s-%s-%s", prefix, workpackage, site)
 }
 
-func (runtime *Runtime) Pull(workpackage string, site string) error {
+type PullOpts struct {
+	Workpackage string
+	Site        string
+}
+
+func (runtime *Runtime) Pull(pullOpts PullOpts) error {
 	opts := docker.PullImageOptions{
 		Context:      runtime.context,
-		Repository:   sprintRepositoryName(workpackage),
-		Tag:          site,
+		Repository:   sprintRepositoryName(pullOpts.Workpackage),
+		Tag:          pullOpts.Site,
 		OutputStream: os.Stdout,
 	}
 	return runtime.client.PullImage(opts, runtime.authConfig)
 }
 
-func (runtime *Runtime) Run(containerNamePrefix string, workpackage string, site string) error {
+type RunOpts struct {
+	User   string
+	Env    []string
+	Mounts []docker.Mount
+}
+
+func dockerFromOpts(pullOpts PullOpts, runOpts RunOpts) *docker.Config {
+	return &docker.Config{
+		User:   runOpts.User,
+		Env:    runOpts.Env,
+		Image:  sprintImageName(pullOpts.Workpackage, pullOpts.Site),
+		Mounts: runOpts.Mounts,
+	}
+}
+
+func (runtime *Runtime) Run(containerNamePrefix string, pullOpts PullOpts, runOpts RunOpts) error {
 	containerOpts := docker.CreateContainerOptions{
 		Context: runtime.context,
-		Name:    sprintContainerName(containerNamePrefix, workpackage, site),
-		Config: &docker.Config{
-			Image: sprintImageName(workpackage, site),
-		},
+		Name:    sprintContainerName(containerNamePrefix, pullOpts.Workpackage, pullOpts.Site),
+		Config:  dockerFromOpts(pullOpts, runOpts),
 	}
 	container, err := runtime.client.CreateContainer(containerOpts)
 	if err == nil {

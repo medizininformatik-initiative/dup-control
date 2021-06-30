@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"git.smith.care/smith/uc-phep/polar/polarctl/util"
+	"git.smith.care/smith/uc-phep/polar/polarctl/util/container"
 	"github.com/op/go-logging"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -12,8 +12,12 @@ import (
 var log = logging.MustGetLogger("cmd")
 var containerRuntime *container.Runtime
 var cfgFile string
-var workpackage string
-var site string
+var rootOpts = RootOpts{}
+
+type RootOpts struct {
+	Workpackage string //req
+	Site        string //req
+}
 
 var rootCmd = &cobra.Command{
 	Use:     "polarctl",
@@ -21,7 +25,7 @@ var rootCmd = &cobra.Command{
 	Long:    `polarctl....`,
 	Version: "0.1",
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		site = viper.GetString("site")
+		rootOpts.Site = viper.GetString("site")
 
 		if cr, err := container.NewRuntime(viper.GetString("registryUser"), viper.GetString("registryPass")); err != nil {
 			return err
@@ -46,7 +50,7 @@ func init() {
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "config.toml", "Config file")
 
-	rootCmd.PersistentFlags().StringVar(&workpackage, "wp", "", "Workpackage to execute (e.g. 'wp-1-1-pilot').")
+	rootCmd.PersistentFlags().StringVar(&rootOpts.Workpackage, "wp", "", "Workpackage to execute (e.g. 'wp-1-1-pilot').")
 	_ = rootCmd.MarkPersistentFlagRequired("wp")
 
 	rootCmd.PersistentFlags().String("site", "latest", "Determines which image to use, as images are (not necessarily) hand-tailored for different dic sites. (e.g. 'dic-giessen', 'dic-leipzig', 'dic-muenchen').")
