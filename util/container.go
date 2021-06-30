@@ -29,18 +29,22 @@ func NewRuntime(registryUser string, registryPass string) (*Runtime, error) {
 	}, nil
 }
 
-func SprintRepositoryName(workpackage string) string {
+func sprintRepositoryName(workpackage string) string {
 	return fmt.Sprintf("registry.gitlab.com/smith-phep/polar/%s", workpackage)
 }
 
-func SprintImageName(workpackage string, site string) string {
-	return fmt.Sprintf("%s:%s", SprintRepositoryName(workpackage), site)
+func sprintImageName(workpackage string, site string) string {
+	return fmt.Sprintf("%s:%s", sprintRepositoryName(workpackage), site)
+}
+
+func sprintContainerName(containerNamePrefix string, workpackage string, site string) string {
+	return fmt.Sprintf("polar-%s-%s-%s", containerNamePrefix, workpackage, site)
 }
 
 func (runtime *Runtime) Pull(workpackage string, site string) error {
 	opts := docker.PullImageOptions{
 		Context:      runtime.context,
-		Repository:   SprintRepositoryName(workpackage),
+		Repository:   sprintRepositoryName(workpackage),
 		Tag:          site,
 		OutputStream: os.Stdout,
 	}
@@ -50,9 +54,9 @@ func (runtime *Runtime) Pull(workpackage string, site string) error {
 func (runtime *Runtime) Run(containerNamePrefix string, workpackage string, site string) error {
 	containerOpts := docker.CreateContainerOptions{
 		Context: runtime.context,
-		Name:    fmt.Sprintf("polar-%s-%s-%s", containerNamePrefix, workpackage, site),
+		Name:    sprintContainerName(containerNamePrefix, workpackage, site),
 		Config: &docker.Config{
-			Image: SprintImageName(workpackage, site),
+			Image: sprintImageName(workpackage, site),
 		},
 	}
 	container, err := runtime.client.CreateContainer(containerOpts)
