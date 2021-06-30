@@ -78,7 +78,7 @@ func (runtime *Runtime) Run(containerNamePrefix string, workpackage string, site
 			ID:      container.ID,
 		}
 		if removeErr := runtime.client.RemoveContainer(removeOpts); removeErr != nil {
-			_, _ = fmt.Fprintf(os.Stderr, "Unable to remove container with ID %s, %s", container.ID, removeErr.Error())
+			log.Errorf("Unable to remove container with ID %s, %v", container.ID, removeErr.Error())
 		}
 	}
 
