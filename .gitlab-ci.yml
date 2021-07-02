@@ -1,0 +1,31 @@
+.build:
+  image: golang:1.16-alpine
+  script:
+    - build-releases.sh
+  artifacts:
+    paths:
+      - builds/
+    expose_as: Binaries
+
+build-latest:
+  extends: .build
+  before_script:
+    - version="latest"
+  only:
+    - master
+
+build-branch:
+  extends: .build
+  before_script:
+    - version="${CI_COMMIT_REF_SLUG}"
+  only:
+    - branches
+  except:
+    - master
+
+build-tag:
+  extends: .build
+  before_script:
+    - version="$(echo ${CI_COMMIT_TAG} | cut -c 2-)"
+  only:
+    - tags
