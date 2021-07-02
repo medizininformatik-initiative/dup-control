@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"git.smith.care/smith/uc-phep/polar/polarctl/util/container"
+	docker "github.com/fsouza/go-dockerclient"
 	"github.com/op/go-logging"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -27,10 +28,10 @@ var rootCmd = &cobra.Command{
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		rootOpts.Site = viper.GetString("site")
 
-		if cr, err := container.NewRuntime(viper.GetString("registryUser"), viper.GetString("registryPass")); err != nil {
-			return err
+		if cli, err := docker.NewClientFromEnv(); err != nil {
+			return fmt.Errorf("cannot instantiate docker client, %w", err)
 		} else {
-			containerRuntime = cr
+			containerRuntime = container.NewRuntime(cli, viper.GetString("registryUser"), viper.GetString("registryPass"))
 		}
 		return nil
 	},

@@ -10,23 +10,26 @@ import (
 
 var log = logging.MustGetLogger("util.container")
 
+type DockerClient interface {
+	PullImage(opts docker.PullImageOptions, auth docker.AuthConfiguration) error
+	CreateContainer(opts docker.CreateContainerOptions) (*docker.Container, error)
+	StartContainerWithContext(id string, hostConfig *docker.HostConfig, ctx context.Context) error
+	Logs(opts docker.LogsOptions) error
+	RemoveContainer(opts docker.RemoveContainerOptions) error
+}
+
 type Runtime struct {
 	context    context.Context
-	client     *docker.Client
+	client     DockerClient
 	authConfig docker.AuthConfiguration
 }
 
-func NewRuntime(registryUser string, registryPass string) (*Runtime, error) {
-	cli, err := docker.NewClientFromEnv()
-	if err != nil {
-		return nil, fmt.Errorf("cannot instantiate docker client, %w", err)
-	}
-
+func NewRuntime(client DockerClient, registryUser string, registryPass string) *Runtime {
 	return &Runtime{
 		context:    context.Background(),
-		client:     cli,
+		client:     client,
 		authConfig: docker.AuthConfiguration{Username: registryUser, Password: registryPass},
-	}, nil
+	}
 }
 
 func sprintRepositoryName(workpackage string) string {
