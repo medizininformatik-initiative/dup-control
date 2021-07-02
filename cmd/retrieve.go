@@ -36,7 +36,7 @@ func createOpts(retrieveOpts RetrieveOpts) (container.PullOpts, container.RunOpt
 		},
 	}
 	if runtime.GOOS != "windows" {
-		runOpts.User = fmt.Sprintf("%s:%s")
+		runOpts.User = fmt.Sprintf("%d:%d", os.Getuid(), os.Getgid())
 	}
 	if retrieveOpts.fhirServerUser != "" && retrieveOpts.fhirServerPass != "" {
 		runOpts.Env = append(runOpts.Env,
