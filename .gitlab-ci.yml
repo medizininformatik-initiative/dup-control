@@ -1,6 +1,7 @@
 .build:
   image: golang:1.16-alpine
   script:
+    - apk add -q --no-cache zip
     - build-releases.sh
   artifacts:
     paths:
