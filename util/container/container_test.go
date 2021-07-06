@@ -139,3 +139,25 @@ func TestRunWithStartError(t *testing.T) {
 
 	dockerMock.AssertExpectations(t)
 }
+
+func TestRunWithLogError(t *testing.T) {
+	dockerMock := new(mockClient)
+	runtime := NewRuntime(dockerMock, user, pass)
+
+	dockerMock.On("CreateContainer",
+		mock.Anything).Return(&docker.Container{ID: id}, nil)
+	dockerMock.On("StartContainerWithContext",
+		id, mock.Anything, mock.Anything).Return(nil)
+	dockerMock.On("Logs",
+		mockLockOpts{Container: id, Follow: true}).Return(errors.New("unable to get container logs"))
+	dockerMock.On("RemoveContainer",
+		mockRemoveOpts{ID: id, Force: true}).Return(nil)
+
+	err := runtime.Run("prefix",
+		PullOpts{Workpackage: "wp-0", Site: dic},
+		RunOpts{User: "", Env: []string{}, Mounts: []docker.Mount{}})
+
+	assert.Error(t, err, "unable to get container logs")
+
+	dockerMock.AssertExpectations(t)
+}
