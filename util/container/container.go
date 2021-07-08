@@ -10,23 +10,26 @@ import (
 
 var log = logging.MustGetLogger("util.container")
 
+type DockerClient interface {
+	PullImage(opts docker.PullImageOptions, auth docker.AuthConfiguration) error
+	CreateContainer(opts docker.CreateContainerOptions) (*docker.Container, error)
+	StartContainerWithContext(id string, hostConfig *docker.HostConfig, ctx context.Context) error
+	Logs(opts docker.LogsOptions) error
+	RemoveContainer(opts docker.RemoveContainerOptions) error
+}
+
 type Runtime struct {
 	context    context.Context
-	client     *docker.Client
+	client     DockerClient
 	authConfig docker.AuthConfiguration
 }
 
-func NewRuntime(registryUser string, registryPass string) (*Runtime, error) {
-	cli, err := docker.NewClientFromEnv()
-	if err != nil {
-		return nil, fmt.Errorf("cannot instantiate docker client, %w", err)
-	}
-
+func NewRuntime(client DockerClient, registryUser string, registryPass string) *Runtime {
 	return &Runtime{
 		context:    context.Background(),
-		client:     cli,
+		client:     client,
 		authConfig: docker.AuthConfiguration{Username: registryUser, Password: registryPass},
-	}, nil
+	}
 }
 
 func sprintRepositoryName(workpackage string) string {
@@ -72,6 +75,7 @@ func dockerFromOpts(pullOpts PullOpts, runOpts RunOpts) *docker.Config {
 }
 
 func (runtime *Runtime) Run(containerNamePrefix string, pullOpts PullOpts, runOpts RunOpts) error {
+	removeOpts := RemoveOpts{Force: false}
 	containerOpts := docker.CreateContainerOptions{
 		Context: runtime.context,
 		Name:    sprintContainerName(containerNamePrefix, pullOpts.Workpackage, pullOpts.Site),
@@ -79,7 +83,7 @@ func (runtime *Runtime) Run(containerNamePrefix string, pullOpts PullOpts, runOp
 	}
 	container, err := runtime.client.CreateContainer(containerOpts)
 	if err == nil {
-		defer runtime.remove(container)
+		defer runtime.remove(container, &removeOpts)
 		err = runtime.client.StartContainerWithContext(container.ID, nil, runtime.context)
 	}
 
@@ -92,16 +96,23 @@ func (runtime *Runtime) Run(containerNamePrefix string, pullOpts PullOpts, runOp
 			ErrorStream:  os.Stderr,
 			Follow:       true,
 		}
-		err = runtime.client.Logs(logOpts)
+		if err = runtime.client.Logs(logOpts); err != nil {
+			removeOpts.Force = true
+		}
 	}
 
 	return err
 }
 
-func (runtime *Runtime) remove(container *docker.Container) {
+type RemoveOpts struct {
+	Force bool
+}
+
+func (runtime *Runtime) remove(container *docker.Container, opts *RemoveOpts) {
 	removeOpts := docker.RemoveContainerOptions{
 		Context: runtime.context,
 		ID:      container.ID,
+		Force:   opts.Force,
 	}
 	if err := runtime.client.RemoveContainer(removeOpts); err != nil {
 		log.Errorf("Unable to remove container with ID %s, %v", container.ID, err.Error())
