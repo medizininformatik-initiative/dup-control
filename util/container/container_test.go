@@ -34,13 +34,13 @@ func (mock *mockClient) StartContainerWithContext(id string, hostConfig *docker.
 	return args.Error(0)
 }
 
-type mockLockOpts struct {
+type mockLogOpts struct {
 	Container string
 	Follow    bool
 }
 
 func (mock *mockClient) Logs(opts docker.LogsOptions) error {
-	mockOpts := mockLockOpts{Container: opts.Container, Follow: opts.Follow}
+	mockOpts := mockLogOpts{Container: opts.Container, Follow: opts.Follow}
 	args := mock.Called(mockOpts)
 	return args.Error(0)
 }
@@ -93,7 +93,7 @@ func TestRun(t *testing.T) {
 	dockerMock.On("StartContainerWithContext",
 		id, mock.Anything, mock.Anything).Return(nil)
 	dockerMock.On("Logs",
-		mockLockOpts{Container: id, Follow: true}).Return(nil)
+		mockLogOpts{Container: id, Follow: true}).Return(nil)
 	dockerMock.On("RemoveContainer",
 		mockRemoveOpts{ID: id, Force: false}).Return(nil)
 
@@ -149,7 +149,7 @@ func TestRunWithLogError(t *testing.T) {
 	dockerMock.On("StartContainerWithContext",
 		id, mock.Anything, mock.Anything).Return(nil)
 	dockerMock.On("Logs",
-		mockLockOpts{Container: id, Follow: true}).Return(errors.New("unable to get container logs"))
+		mockLogOpts{Container: id, Follow: true}).Return(errors.New("unable to get container logs"))
 	dockerMock.On("RemoveContainer",
 		mockRemoveOpts{ID: id, Force: true}).Return(nil)
 
