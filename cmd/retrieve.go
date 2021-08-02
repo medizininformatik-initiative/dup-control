@@ -33,8 +33,8 @@ func createOpts(retrieveOpts RetrieveOpts) (container.PullOpts, container.RunOpt
 			fmt.Sprintf("FHIR_SERVER_ENDPOINT=\"%s\"", retrieveOpts.fhirServerEndpoint),
 		},
 		Mounts: []docker.Mount{
-			localMount("outputLocal", true),
-			localMount("outputGlobal", true),
+			container.LocalMount("outputLocal", true),
+			container.LocalMount("outputGlobal", true),
 		},
 	}
 	if runtime.GOOS != "windows" {
@@ -54,15 +54,6 @@ func createOpts(retrieveOpts RetrieveOpts) (container.PullOpts, container.RunOpt
 				RW:          false})
 	}
 	return pullOpts, runOpts
-}
-
-func localMount(dir string, rw bool) docker.Mount {
-	workdir, _ := os.Getwd()
-	return docker.Mount{
-		Source:      fmt.Sprintf("%s/%s", workdir, dir),
-		Destination: fmt.Sprintf("/opt/%s", dir),
-		Driver:      "local",
-		RW:          rw}
 }
 
 var retrieveCommand = &cobra.Command{

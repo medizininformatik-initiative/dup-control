@@ -118,3 +118,12 @@ func (runtime *Runtime) remove(container *docker.Container, opts *RemoveOpts) {
 		log.Errorf("Unable to remove container with ID %s, %v", container.ID, err.Error())
 	}
 }
+
+func LocalMount(dir string, rw bool) docker.Mount {
+	workdir, _ := os.Getwd()
+	return docker.Mount{
+		Source:      fmt.Sprintf("%s/%s", workdir, dir),
+		Destination: fmt.Sprintf("/opt/%s", dir),
+		Driver:      "local",
+		RW:          rw}
+}
