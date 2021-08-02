@@ -17,8 +17,6 @@ type RetrieveOpts struct {
 	fhirServerUser     string
 	fhirServerPass     string
 	fhirServerCACert   string
-	dev                bool
-	test               bool
 }
 
 var retrieveOpts = RetrieveOpts{}
