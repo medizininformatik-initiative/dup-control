@@ -15,10 +15,7 @@ var containerRuntime *container.Runtime
 var cfgFile string
 var rootOpts = RootOpts{}
 
-type RootOpts struct {
-	Workpackage string //req
-	Site        string //req
-}
+type RootOpts struct{}
 
 var rootCmd = &cobra.Command{
 	Use:     "polarctl",
@@ -26,8 +23,6 @@ var rootCmd = &cobra.Command{
 	Long:    `polarctl....`,
 	Version: "0.1",
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		rootOpts.Site = viper.GetString("site")
-
 		if cli, err := docker.NewClientFromEnv(); err != nil {
 			return fmt.Errorf("cannot instantiate docker client, %w", err)
 		} else {
@@ -50,12 +45,6 @@ func init() {
 	cobra.OnInitialize(initConfig)
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "config.toml", "Config file")
-
-	rootCmd.PersistentFlags().StringVar(&rootOpts.Workpackage, "wp", "", "Workpackage to execute (e.g. 'wp-1-1-pilot').")
-	_ = rootCmd.MarkPersistentFlagRequired("wp")
-
-	rootCmd.PersistentFlags().String("site", "latest", "Determines which image to use, as images are (not necessarily) hand-tailored for different dic sites. (e.g. 'dic-giessen', 'dic-leipzig', 'dic-muenchen').")
-	_ = viper.BindPFlag("site", rootCmd.PersistentFlags().Lookup("site"))
 }
 
 func initConfig() {

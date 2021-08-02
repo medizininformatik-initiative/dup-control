@@ -11,6 +11,8 @@ import (
 )
 
 type RetrieveOpts struct {
+	Workpackage        string //req
+	Site               string //req
 	fhirServerEndpoint string
 	fhirServerUser     string
 	fhirServerPass     string
@@ -23,8 +25,8 @@ var retrieveOpts = RetrieveOpts{}
 
 func createOpts(retrieveOpts RetrieveOpts) (container.PullOpts, container.RunOpts) {
 	pullOpts := container.PullOpts{
-		Workpackage: rootOpts.Workpackage,
-		Site:        rootOpts.Site,
+		Workpackage: retrieveOpts.Workpackage,
+		Site:        retrieveOpts.Site,
 	}
 	runOpts := container.RunOpts{
 		Env: []string{
@@ -73,6 +75,7 @@ var retrieveCommand = &cobra.Command{
 		} else {
 			retrieveOpts.fhirServerEndpoint = viper.GetString("fhirServerEndpoint")
 		}
+		retrieveOpts.Site = viper.GetString("site")
 		retrieveOpts.fhirServerUser = viper.GetString("fhirServerUser")
 		retrieveOpts.fhirServerPass = viper.GetString("fhirServerPass")
 		retrieveOpts.fhirServerCACert = viper.GetString("fhirServerCACert")
@@ -94,6 +97,12 @@ var retrieveCommand = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(retrieveCommand)
+
+	retrieveCommand.PersistentFlags().StringVar(&retrieveOpts.Workpackage, "wp", "", "Workpackage to execute (e.g. 'wp-1-1-pilot').")
+	_ = retrieveCommand.MarkPersistentFlagRequired("wp")
+
+	retrieveCommand.PersistentFlags().String("site", "latest", "Determines which image to use, as images are (not necessarily) hand-tailored for different dic sites. (e.g. 'dic-giessen', 'dic-leipzig', 'dic-muenchen').")
+	_ = viper.BindPFlag("site", retrieveCommand.PersistentFlags().Lookup("site"))
 
 	retrieveCommand.PersistentFlags().String("fhirServerEndpoint", "", "the base URL of the FHIR server to use")
 	_ = viper.BindPFlag("fhirServerEndpoint", retrieveCommand.PersistentFlags().Lookup("fhirServerEndpoint"))
