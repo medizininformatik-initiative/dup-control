@@ -1,0 +1,44 @@
+image: golang:1.16-alpine
+
+stages:
+  - test
+  - build
+
+test:
+  stage: test
+  script:
+    - apk add -q --no-cache build-base
+    - go test -v ./...
+
+.build:
+  stage: build
+  script:
+    - apk add -q --no-cache zip
+    - ./build-releases.sh -e
+  artifacts:
+    paths:
+      - builds/
+    expose_as: Binaries
+
+build-latest:
+  extends: .build
+  before_script:
+    - version="latest"
+  only:
+    - master
+
+build-branch:
+  extends: .build
+  before_script:
+    - version="${CI_COMMIT_REF_SLUG}"
+  only:
+    - branches
+  except:
+    - master
+
+build-tag:
+  extends: .build
+  before_script:
+    - version="$(echo ${CI_COMMIT_TAG} | cut -c 2-)"
+  only:
+    - tags
