@@ -21,7 +21,7 @@ type RetrieveOpts struct {
 
 var retrieveOpts = RetrieveOpts{}
 
-func createOpts(retrieveOpts RetrieveOpts) (container.PullOpts, container.RunOpts) {
+func createRetrieveOpts(retrieveOpts RetrieveOpts) (container.PullOpts, container.RunOpts) {
 	pullOpts := container.PullOpts{
 		Workpackage: retrieveOpts.Workpackage,
 		Site:        retrieveOpts.Site,
@@ -71,7 +71,7 @@ var retrieveCommand = &cobra.Command{
 		return nil
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
-		pullOpts, runOpts := createOpts(retrieveOpts)
+		pullOpts, runOpts := createRetrieveOpts(retrieveOpts)
 		if err := containerRuntime.Pull(pullOpts); err != nil {
 			return err
 		}
