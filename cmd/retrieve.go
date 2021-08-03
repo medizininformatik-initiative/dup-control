@@ -11,28 +11,28 @@ import (
 )
 
 type RetrieveOpts struct {
+	Workpackage        string //req
+	Site               string //req
 	fhirServerEndpoint string
 	fhirServerUser     string
 	fhirServerPass     string
 	fhirServerCACert   string
-	dev                bool
-	test               bool
 }
 
 var retrieveOpts = RetrieveOpts{}
 
-func createOpts(retrieveOpts RetrieveOpts) (container.PullOpts, container.RunOpts) {
+func createRetrieveOpts(retrieveOpts RetrieveOpts) (container.PullOpts, container.RunOpts) {
 	pullOpts := container.PullOpts{
-		Workpackage: rootOpts.Workpackage,
-		Site:        rootOpts.Site,
+		Workpackage: retrieveOpts.Workpackage,
+		Site:        retrieveOpts.Site,
 	}
 	runOpts := container.RunOpts{
 		Env: []string{
 			fmt.Sprintf("FHIR_SERVER_ENDPOINT=\"%s\"", retrieveOpts.fhirServerEndpoint),
 		},
 		Mounts: []docker.Mount{
-			localMount("outputLocal", true),
-			localMount("outputGlobal", true),
+			container.LocalMount("outputLocal", true),
+			container.LocalMount("outputGlobal", true),
 		},
 	}
 	if runtime.GOOS != "windows" {
@@ -54,15 +54,6 @@ func createOpts(retrieveOpts RetrieveOpts) (container.PullOpts, container.RunOpt
 	return pullOpts, runOpts
 }
 
-func localMount(dir string, rw bool) docker.Mount {
-	workdir, _ := os.Getwd()
-	return docker.Mount{
-		Source:      fmt.Sprintf("%s/%s", workdir, dir),
-		Destination: fmt.Sprintf("/opt/%s", dir),
-		Driver:      "local",
-		RW:          rw}
-}
-
 var retrieveCommand = &cobra.Command{
 	Use:   "retrieve",
 	Short: "Retrieve bundles from FHIR server",
@@ -73,13 +64,14 @@ var retrieveCommand = &cobra.Command{
 		} else {
 			retrieveOpts.fhirServerEndpoint = viper.GetString("fhirServerEndpoint")
 		}
+		retrieveOpts.Site = viper.GetString("site")
 		retrieveOpts.fhirServerUser = viper.GetString("fhirServerUser")
 		retrieveOpts.fhirServerPass = viper.GetString("fhirServerPass")
 		retrieveOpts.fhirServerCACert = viper.GetString("fhirServerCACert")
 		return nil
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
-		pullOpts, runOpts := createOpts(retrieveOpts)
+		pullOpts, runOpts := createRetrieveOpts(retrieveOpts)
 		if err := containerRuntime.Pull(pullOpts); err != nil {
 			return err
 		}
@@ -94,6 +86,12 @@ var retrieveCommand = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(retrieveCommand)
+
+	retrieveCommand.PersistentFlags().StringVar(&retrieveOpts.Workpackage, "wp", "", "Workpackage to execute (e.g. 'wp-1-1-pilot').")
+	_ = retrieveCommand.MarkPersistentFlagRequired("wp")
+
+	retrieveCommand.PersistentFlags().String("site", "latest", "Determines which image to use, as images are (not necessarily) hand-tailored for different dic sites. (e.g. 'dic-giessen', 'dic-leipzig', 'dic-muenchen').")
+	_ = viper.BindPFlag("site", retrieveCommand.PersistentFlags().Lookup("site"))
 
 	retrieveCommand.PersistentFlags().String("fhirServerEndpoint", "", "the base URL of the FHIR server to use")
 	_ = viper.BindPFlag("fhirServerEndpoint", retrieveCommand.PersistentFlags().Lookup("fhirServerEndpoint"))
