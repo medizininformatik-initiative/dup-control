@@ -23,7 +23,7 @@ func createAnalyseOpts(analyzeOpts AnalyzeOpts) (container.PullOpts, container.R
 	}
 	runOpts := container.RunOpts{
 		Env: []string{},
-		Mounts: []docker.Mount{
+		Mounts: []docker.HostMount{
 			container.LocalMount("outputLocal", true),
 			container.LocalMount("outputGlobal", true),
 		},

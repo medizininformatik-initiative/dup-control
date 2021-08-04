@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"os"
+	"path/filepath"
 	"runtime"
 )
 
@@ -30,7 +31,7 @@ func createRetrieveOpts(retrieveOpts RetrieveOpts) (container.PullOpts, containe
 		Env: []string{
 			fmt.Sprintf("FHIR_SERVER_ENDPOINT=\"%s\"", retrieveOpts.fhirServerEndpoint),
 		},
-		Mounts: []docker.Mount{
+		Mounts: []docker.HostMount{
 			container.LocalMount("outputLocal", true),
 			container.LocalMount("outputGlobal", true),
 		},
@@ -44,12 +45,16 @@ func createRetrieveOpts(retrieveOpts RetrieveOpts) (container.PullOpts, containe
 			fmt.Sprintf("FHIR_SERVER_PASS=\"%s\"", retrieveOpts.fhirServerPass))
 	}
 	if retrieveOpts.fhirServerCACert != "" {
-		runOpts.Mounts = append(runOpts.Mounts,
-			docker.Mount{
-				Source:      retrieveOpts.fhirServerCACert,
-				Destination: "/etc/ssl/certs/ca-certificates.crt",
-				Driver:      "local",
-				RW:          false})
+		if abs, err := filepath.Abs(retrieveOpts.fhirServerCACert); err == nil {
+			runOpts.Mounts = append(runOpts.Mounts,
+				docker.HostMount{
+					Source:   abs,
+					Target:   "/etc/ssl/certs/ca-certificates.crt",
+					Type:     "bind",
+					ReadOnly: true})
+		} else {
+			log.Errorf("Skipping Certificate Injection: error converting path %s", retrieveOpts.fhirServerCACert)
+		}
 	}
 	return pullOpts, runOpts
 }

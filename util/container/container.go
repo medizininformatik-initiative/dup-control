@@ -2,10 +2,12 @@ package container
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	docker "github.com/fsouza/go-dockerclient"
 	"github.com/op/go-logging"
 	"os"
+	"path/filepath"
 )
 
 var log = logging.MustGetLogger("util.container")
@@ -62,24 +64,30 @@ func (runtime *Runtime) Pull(pullOpts PullOpts) error {
 type RunOpts struct {
 	User   string
 	Env    []string
-	Mounts []docker.Mount
+	Mounts []docker.HostMount
 }
 
-func dockerFromOpts(pullOpts PullOpts, runOpts RunOpts) *docker.Config {
+func containerConfigFromOpts(pullOpts PullOpts, runOpts RunOpts) *docker.Config {
+	out, _ := json.Marshal(runOpts.Mounts)
+	log.Debugf("Mounts: %s", string(out))
 	return &docker.Config{
-		User:   runOpts.User,
-		Env:    runOpts.Env,
-		Image:  sprintImageName(pullOpts.Workpackage, pullOpts.Site),
-		Mounts: runOpts.Mounts,
+		User:  runOpts.User,
+		Env:   runOpts.Env,
+		Image: sprintImageName(pullOpts.Workpackage, pullOpts.Site),
 	}
+}
+
+func containerHostConfigFromOpts(opts RunOpts) *docker.HostConfig {
+	return &docker.HostConfig{Mounts: opts.Mounts}
 }
 
 func (runtime *Runtime) Run(containerNamePrefix string, pullOpts PullOpts, runOpts RunOpts) error {
 	removeOpts := RemoveOpts{Force: false}
 	containerOpts := docker.CreateContainerOptions{
-		Context: runtime.context,
-		Name:    sprintContainerName(containerNamePrefix, pullOpts.Workpackage, pullOpts.Site),
-		Config:  dockerFromOpts(pullOpts, runOpts),
+		Context:    runtime.context,
+		Name:       sprintContainerName(containerNamePrefix, pullOpts.Workpackage, pullOpts.Site),
+		Config:     containerConfigFromOpts(pullOpts, runOpts),
+		HostConfig: containerHostConfigFromOpts(runOpts),
 	}
 	container, err := runtime.client.CreateContainer(containerOpts)
 	if err == nil {
@@ -119,11 +127,12 @@ func (runtime *Runtime) remove(container *docker.Container, opts *RemoveOpts) {
 	}
 }
 
-func LocalMount(dir string, rw bool) docker.Mount {
+func LocalMount(dir string, rw bool) docker.HostMount {
 	workdir, _ := os.Getwd()
-	return docker.Mount{
-		Source:      fmt.Sprintf("%s/%s", workdir, dir),
-		Destination: fmt.Sprintf("/opt/%s", dir),
-		Driver:      "local",
-		RW:          rw}
+	path, _ := filepath.Abs(workdir)
+	return docker.HostMount{
+		Source:   filepath.Join(path, dir),
+		Target:   fmt.Sprintf("/opt/%s", dir),
+		Type:     "bind",
+		ReadOnly: !rw}
 }
