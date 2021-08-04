@@ -99,7 +99,7 @@ func TestRun(t *testing.T) {
 
 	_ = runtime.Run("prefix",
 		PullOpts{Workpackage: "wp-0", Site: dic},
-		RunOpts{User: "", Env: []string{}, Mounts: []docker.Mount{}})
+		RunOpts{User: "", Env: []string{}, Mounts: []docker.HostMount{}})
 
 	dockerMock.AssertExpectations(t)
 }
@@ -113,7 +113,7 @@ func TestRunWithCreateError(t *testing.T) {
 
 	err := runtime.Run("prefix",
 		PullOpts{Workpackage: "wp-0", Site: dic},
-		RunOpts{User: "", Env: []string{}, Mounts: []docker.Mount{}})
+		RunOpts{User: "", Env: []string{}, Mounts: []docker.HostMount{}})
 
 	assert.Error(t, err, "unable to create container")
 
@@ -133,7 +133,7 @@ func TestRunWithStartError(t *testing.T) {
 
 	err := runtime.Run("prefix",
 		PullOpts{Workpackage: "wp-0", Site: dic},
-		RunOpts{User: "", Env: []string{}, Mounts: []docker.Mount{}})
+		RunOpts{User: "", Env: []string{}, Mounts: []docker.HostMount{}})
 
 	assert.Error(t, err, "unable to start container")
 
@@ -155,7 +155,7 @@ func TestRunWithLogError(t *testing.T) {
 
 	err := runtime.Run("prefix",
 		PullOpts{Workpackage: "wp-0", Site: dic},
-		RunOpts{User: "", Env: []string{}, Mounts: []docker.Mount{}})
+		RunOpts{User: "", Env: []string{}, Mounts: []docker.HostMount{}})
 
 	assert.Error(t, err, "unable to get container logs")
 
