@@ -11,6 +11,7 @@ import (
 
 type AnalyzeOpts struct {
 	Workpackage string //req
+	Version     string
 }
 
 var analyzeOpts = AnalyzeOpts{}
@@ -18,7 +19,7 @@ var analyzeOpts = AnalyzeOpts{}
 func createAnalyseOpts(analyzeOpts AnalyzeOpts) (container.PullOpts, container.RunOpts) {
 	pullOpts := container.PullOpts{
 		Workpackage: fmt.Sprintf("%s-analysis", analyzeOpts.Workpackage),
-		Site:        "latest",
+		Site:        analyzeOpts.Version,
 	}
 	runOpts := container.RunOpts{
 		Env: []string{},
@@ -56,4 +57,6 @@ func init() {
 
 	analyzeCommand.PersistentFlags().StringVar(&analyzeOpts.Workpackage, "wp", "", "Workpackage to execute (e.g. 'wp-1-1-pilot').")
 	_ = analyzeCommand.MarkPersistentFlagRequired("wp")
+
+	analyzeCommand.PersistentFlags().StringVar(&analyzeOpts.Version, "version", "latest", "Determines which image version to use.")
 }
