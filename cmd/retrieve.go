@@ -24,8 +24,8 @@ var retrieveOpts = RetrieveOpts{}
 
 func createRetrieveOpts(retrieveOpts RetrieveOpts) (container.PullOpts, container.RunOpts) {
 	pullOpts := container.PullOpts{
-		Workpackage: retrieveOpts.Workpackage,
-		Site:        retrieveOpts.Site,
+		Image: retrieveOpts.Workpackage,
+		Tag:   retrieveOpts.Site,
 	}
 	runOpts := container.RunOpts{
 		Env: []string{
@@ -92,7 +92,7 @@ var retrieveCommand = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(retrieveCommand)
 
-	retrieveCommand.PersistentFlags().StringVar(&retrieveOpts.Workpackage, "wp", "", "Workpackage to execute (e.g. 'wp-1-1-pilot').")
+	retrieveCommand.PersistentFlags().StringVar(&retrieveOpts.Workpackage, "wp", "", "Image to execute (e.g. 'wp-1-1-pilot').")
 	_ = retrieveCommand.MarkPersistentFlagRequired("wp")
 
 	retrieveCommand.PersistentFlags().String("site", "latest", "Determines which image to use, as images are (not necessarily) hand-tailored for different dic sites. (e.g. 'dic-giessen', 'dic-leipzig', 'dic-muenchen').")

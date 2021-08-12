@@ -47,15 +47,15 @@ func sprintContainerName(prefix string, workpackage string, site string) string 
 }
 
 type PullOpts struct {
-	Workpackage string
-	Site        string
+	Image string
+	Tag   string
 }
 
 func (runtime *Runtime) Pull(pullOpts PullOpts) error {
 	opts := docker.PullImageOptions{
 		Context:      runtime.context,
-		Repository:   sprintRepositoryName(pullOpts.Workpackage),
-		Tag:          pullOpts.Site,
+		Repository:   sprintRepositoryName(pullOpts.Image),
+		Tag:          pullOpts.Tag,
 		OutputStream: os.Stdout,
 	}
 	return runtime.client.PullImage(opts, runtime.authConfig)
@@ -73,7 +73,7 @@ func containerConfigFromOpts(pullOpts PullOpts, runOpts RunOpts) *docker.Config 
 	return &docker.Config{
 		User:  runOpts.User,
 		Env:   runOpts.Env,
-		Image: sprintImageName(pullOpts.Workpackage, pullOpts.Site),
+		Image: sprintImageName(pullOpts.Image, pullOpts.Tag),
 	}
 }
 
@@ -85,7 +85,7 @@ func (runtime *Runtime) Run(containerNamePrefix string, pullOpts PullOpts, runOp
 	removeOpts := RemoveOpts{Force: false}
 	containerOpts := docker.CreateContainerOptions{
 		Context:    runtime.context,
-		Name:       sprintContainerName(containerNamePrefix, pullOpts.Workpackage, pullOpts.Site),
+		Name:       sprintContainerName(containerNamePrefix, pullOpts.Image, pullOpts.Tag),
 		Config:     containerConfigFromOpts(pullOpts, runOpts),
 		HostConfig: containerHostConfigFromOpts(runOpts),
 	}

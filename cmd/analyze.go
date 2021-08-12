@@ -18,8 +18,8 @@ var analyzeOpts = AnalyzeOpts{}
 
 func createAnalyseOpts(analyzeOpts AnalyzeOpts) (container.PullOpts, container.RunOpts) {
 	pullOpts := container.PullOpts{
-		Workpackage: fmt.Sprintf("%s-analysis", analyzeOpts.Workpackage),
-		Site:        analyzeOpts.Version,
+		Image: fmt.Sprintf("%s-analysis", analyzeOpts.Workpackage),
+		Tag:   analyzeOpts.Version,
 	}
 	runOpts := container.RunOpts{
 		Env: []string{},
@@ -55,7 +55,7 @@ var analyzeCommand = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(analyzeCommand)
 
-	analyzeCommand.PersistentFlags().StringVar(&analyzeOpts.Workpackage, "wp", "", "Workpackage to execute (e.g. 'wp-1-1-pilot').")
+	analyzeCommand.PersistentFlags().StringVar(&analyzeOpts.Workpackage, "wp", "", "Image to execute (e.g. 'wp-1-1-pilot').")
 	_ = analyzeCommand.MarkPersistentFlagRequired("wp")
 
 	analyzeCommand.PersistentFlags().StringVar(&analyzeOpts.Version, "version", "latest", "Determines which image version to use.")

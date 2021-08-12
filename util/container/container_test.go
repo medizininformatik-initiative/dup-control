@@ -68,7 +68,7 @@ func TestPull(t *testing.T) {
 		mockPullOpts{Repository: "registry.gitlab.com/smith-phep/polar/wp-0", Tag: dic},
 		docker.AuthConfiguration{Username: user, Password: pass}).Return(nil)
 
-	_ = runtime.Pull(PullOpts{Workpackage: "wp-0", Site: dic})
+	_ = runtime.Pull(PullOpts{Image: "wp-0", Tag: dic})
 
 	dockerMock.AssertExpectations(t)
 }
@@ -78,7 +78,7 @@ func TestPullError(t *testing.T) {
 	runtime := NewRuntime(dockerMock, user, pass)
 	dockerMock.On("PullImage", mock.Anything, mock.Anything).Return(errors.New("unable to pull image"))
 
-	err := runtime.Pull(PullOpts{Workpackage: "wp-6", Site: dic})
+	err := runtime.Pull(PullOpts{Image: "wp-6", Tag: dic})
 
 	assert.Error(t, err, "unable to pull image")
 	dockerMock.AssertExpectations(t)
@@ -98,7 +98,7 @@ func TestRun(t *testing.T) {
 		mockRemoveOpts{ID: id, Force: false}).Return(nil)
 
 	_ = runtime.Run("prefix",
-		PullOpts{Workpackage: "wp-0", Site: dic},
+		PullOpts{Image: "wp-0", Tag: dic},
 		RunOpts{User: "", Env: []string{}, Mounts: []docker.HostMount{}})
 
 	dockerMock.AssertExpectations(t)
@@ -112,7 +112,7 @@ func TestRunWithCreateError(t *testing.T) {
 		mock.Anything).Return(&docker.Container{}, errors.New("unable to create container"))
 
 	err := runtime.Run("prefix",
-		PullOpts{Workpackage: "wp-0", Site: dic},
+		PullOpts{Image: "wp-0", Tag: dic},
 		RunOpts{User: "", Env: []string{}, Mounts: []docker.HostMount{}})
 
 	assert.Error(t, err, "unable to create container")
@@ -132,7 +132,7 @@ func TestRunWithStartError(t *testing.T) {
 		mockRemoveOpts{ID: id, Force: false}).Return(nil)
 
 	err := runtime.Run("prefix",
-		PullOpts{Workpackage: "wp-0", Site: dic},
+		PullOpts{Image: "wp-0", Tag: dic},
 		RunOpts{User: "", Env: []string{}, Mounts: []docker.HostMount{}})
 
 	assert.Error(t, err, "unable to start container")
@@ -154,7 +154,7 @@ func TestRunWithLogError(t *testing.T) {
 		mockRemoveOpts{ID: id, Force: true}).Return(nil)
 
 	err := runtime.Run("prefix",
-		PullOpts{Workpackage: "wp-0", Site: dic},
+		PullOpts{Image: "wp-0", Tag: dic},
 		RunOpts{User: "", Env: []string{}, Mounts: []docker.HostMount{}})
 
 	assert.Error(t, err, "unable to get container logs")
