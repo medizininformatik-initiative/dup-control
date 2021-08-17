@@ -43,6 +43,10 @@ registryPass = "<password>"
 
 ### Retrieval
 
+```shell
+polarctl retrieve --wp <workpackage> --fhir-server-endpoint "https://some-fhir-server" [flags] 
+```
+
 #### Settings
 
 Some settings can be set via CLI flag or config file. The table below lists the flags and corresponding keys for 
@@ -64,6 +68,10 @@ polarctl retrieve --wp wp-1-1-pilot --fhir-server-endpoint "https://mii-agiop-3p
 ```
 
 ### Analysis
+
+```shell
+polarctl analyze --wp <workpackage> [flags] 
+```
 
 #### Settings
 
