@@ -2,7 +2,6 @@ package container
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	docker "github.com/fsouza/go-dockerclient"
 	"github.com/op/go-logging"
@@ -68,8 +67,6 @@ type RunOpts struct {
 }
 
 func containerConfigFromOpts(pullOpts PullOpts, runOpts RunOpts) *docker.Config {
-	out, _ := json.Marshal(runOpts.Mounts)
-	log.Debugf("Mounts: %s", string(out))
 	return &docker.Config{
 		User:  runOpts.User,
 		Env:   runOpts.Env,
