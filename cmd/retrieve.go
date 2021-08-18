@@ -98,15 +98,15 @@ func init() {
 	retrieveCommand.PersistentFlags().String("site", "latest", "Determines which image to use, as images are (not necessarily) hand-tailored for different dic sites. (e.g. 'dic-giessen', 'dic-leipzig', 'dic-muenchen').")
 	_ = viper.BindPFlag("site", retrieveCommand.PersistentFlags().Lookup("site"))
 
-	retrieveCommand.PersistentFlags().String("fhirServerEndpoint", "", "the base URL of the FHIR server to use")
-	_ = viper.BindPFlag("fhirServerEndpoint", retrieveCommand.PersistentFlags().Lookup("fhirServerEndpoint"))
+	retrieveCommand.PersistentFlags().String("fhir-server-endpoint", "", "the base URL of the FHIR server to use")
+	_ = viper.BindPFlag("fhirServerEndpoint", retrieveCommand.PersistentFlags().Lookup("fhir-server-endpoint"))
 
-	retrieveCommand.PersistentFlags().String("fhirServerUser", "", "fhirServerUser for basic auth protected communication with FHIR server")
-	_ = viper.BindPFlag("fhirServerUser", retrieveCommand.PersistentFlags().Lookup("fhirServerUser"))
+	retrieveCommand.PersistentFlags().String("fhir-server-user", "", "fhirServerUser for basic auth protected communication with FHIR server")
+	_ = viper.BindPFlag("fhirServerUser", retrieveCommand.PersistentFlags().Lookup("fhir-server-user"))
 
-	retrieveCommand.PersistentFlags().String("fhirServerPass", "", "fhirServerPass for basic auth protected communication with FHIR server")
-	_ = viper.BindPFlag("fhirServerPass", retrieveCommand.PersistentFlags().Lookup("fhirServerPass"))
+	retrieveCommand.PersistentFlags().String("fhir-server-pass", "", "fhirServerPass for basic auth protected communication with FHIR server")
+	_ = viper.BindPFlag("fhirServerPass", retrieveCommand.PersistentFlags().Lookup("fhir-server-pass"))
 
-	retrieveCommand.PersistentFlags().String("fhirServerCACert", "", "CA Certificate file for https connection to FHIR Server")
-	_ = viper.BindPFlag("fhirServerCACert", retrieveCommand.PersistentFlags().Lookup("fhirServerCACert"))
+	retrieveCommand.PersistentFlags().String("fhir-server-cacert", "", "CA Certificate file for https connection to FHIR Server")
+	_ = viper.BindPFlag("fhirServerCACert", retrieveCommand.PersistentFlags().Lookup("fhir-server-cacert"))
 }
