@@ -1,4 +1,5 @@
 # Polar Control
+
 Utility to manage [POLAR][polar] workpackage and -pilot algorithm
 execution using docker.
 
@@ -11,6 +12,7 @@ execution using docker.
 * [MacOS][darwin-amd64] ([arm][darwin-arm64])
 
 ### Windows
+
 Unpack the downloaded archive and move `polarctl.exe` into a directory in your PATH (`echo $env:PATH` (PowerShell)). 
 
 * using `C:\Windows\System32\` will enable polarctl for all users. *Note: Access to C:\Windows\System32\ may require administrator access privileges.*
@@ -19,6 +21,7 @@ Unpack the downloaded archive and move `polarctl.exe` into a directory in your P
 polarctl can then be executed via cmd or powershell. 
 
 ### Linux / macOS
+
 Unpack the downloaded archive and move `polarctl` into a directory in your PATH (`echo $PATH`).
 
 ```shell
@@ -63,6 +66,7 @@ the config file. *CLI opts will override config settings.*
 | --fhir-server-cacert   | fhirServerCACert    | CA Certificate file[^cafile] for https connection to FHIR Server     | Yes       |         |
 
 #### Example
+
 ```shell
 polarctl retrieve --wp wp-1-1-pilot --fhir-server-endpoint "https://mii-agiop-3p.life.uni-leipzig.de/fhir/" --site "dic-giessen"
 ```
@@ -85,6 +89,7 @@ the config file. *CLI opts will override config settings.*
 | --version              | site                | Determines which version of the analysis algorithm to use .          | Yes       | latest |
 
 #### Example
+
 ```shell
 polarctl analyze --wp wp-1-1-pilot --version "1.0"
 ```
