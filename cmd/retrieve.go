@@ -29,7 +29,7 @@ func createRetrieveOpts(retrieveOpts RetrieveOpts) (container.PullOpts, containe
 	}
 	runOpts := container.RunOpts{
 		Env: []string{
-			fmt.Sprintf("FHIR_ENDPOINT=\"%s\"", retrieveOpts.fhirServerEndpoint),
+			fmt.Sprintf("FHIR_ENDPOINT=%s", retrieveOpts.fhirServerEndpoint),
 		},
 		Mounts: []docker.HostMount{
 			container.LocalMount("outputLocal", true),
@@ -41,8 +41,8 @@ func createRetrieveOpts(retrieveOpts RetrieveOpts) (container.PullOpts, containe
 	}
 	if retrieveOpts.fhirServerUser != "" && retrieveOpts.fhirServerPass != "" {
 		runOpts.Env = append(runOpts.Env,
-			fmt.Sprintf("FHIR_USERNAME=\"%s\"", retrieveOpts.fhirServerUser),
-			fmt.Sprintf("FHIR_PASSWORD=\"%s\"", retrieveOpts.fhirServerPass))
+			fmt.Sprintf("FHIR_USERNAME=%s", retrieveOpts.fhirServerUser),
+			fmt.Sprintf("FHIR_PASSWORD=%s", retrieveOpts.fhirServerPass))
 	}
 	if retrieveOpts.fhirServerCACert != "" {
 		if abs, err := filepath.Abs(retrieveOpts.fhirServerCACert); err == nil {
