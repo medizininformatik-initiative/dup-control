@@ -65,7 +65,7 @@ var retrieveCommand = &cobra.Command{
 	Long:  "You can retrieve bundles from the FHIR server for a specific POLAR workpackage",
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if viper.GetString("retrieve.fhirServerEndpoint") == "" {
-			return fmt.Errorf("fhirServerEndpoint not set")
+			return fmt.Errorf("retrieve.fhirServerEndpoint not set")
 		} else {
 			retrieveOpts.fhirServerEndpoint = viper.GetString("retrieve.fhirServerEndpoint")
 		}
