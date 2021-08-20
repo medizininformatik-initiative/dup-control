@@ -129,7 +129,7 @@ func LocalMount(dir string, rw bool) docker.HostMount {
 	path, _ := filepath.Abs(workdir)
 	return docker.HostMount{
 		Source:   filepath.Join(path, dir),
-		Target:   fmt.Sprintf("/opt/%s", dir),
+		Target:   fmt.Sprintf("/polar/%s", dir),
 		Type:     "bind",
 		ReadOnly: !rw}
 }
