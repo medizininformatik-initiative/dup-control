@@ -55,15 +55,15 @@ polarctl retrieve --wp <workpackage> --fhir-server-endpoint "https://some-fhir-s
 Some settings can be set via CLI flag or config file. The table below lists the flags and corresponding keys for 
 the config file. *CLI opts will override config settings.*
 
-| CLI Flag               | Config Key          | Description                                                          | Optional? | Default |
-|------------------------|---------------------|----------------------------------------------------------------------|-----------|---------|
-| --config               |                     | Specify a config file rather than using the default config path      | Yes       | config.toml |
-| --wp                   |                     | Workpackage algorithm to execute, e.g. 'wp-1-1-pilot' | No        |     | 
-| --site                 | site                | Determines which image to use, as images are (not necessarily) hand-tailored for different dic sites. (e.g. 'dic-giessen', 'dic-leipzig', 'dic-muenchen'). | Yes        | latest |
-| --fhir-server-endpoint | fhirServerEndpoint  | URL including base path of the FHIR Server to be queried, e.g.: 'https://example.com/r4/' | No        |     |
-| --fhir-server-user     | fhirServerUser      | Username for basic auth protected communication with FHIR Server     | Yes       |         |
-| --fhir-server-pass     | fhirServerPass      | Password for basic auth protected communication with FHIR Server     | Yes       |         |
-| --fhir-server-cacert   | fhirServerCACert    | CA Certificate file[^cafile] for https connection to FHIR Server     | Yes       |         |
+| CLI Flag               | Config Key                   | Description                                                          | Optional? | Default |
+|------------------------|------------------------------|----------------------------------------------------------------------|-----------|---------|
+| --config               |                              | Specify a config file rather than using the default config path      | Yes       | config.toml |
+| --wp                   |                              | Workpackage algorithm to execute, e.g. 'wp-1-1-pilot'                | No        |     | 
+| --site                 | retrieve.site                | Determines which image to use, as images are (not necessarily) hand-tailored for different dic sites. (e.g. 'dic-giessen', 'dic-leipzig', 'dic-muenchen'). | Yes        | latest |
+| --fhir-server-endpoint | retrieve.fhirServerEndpoint  | URL including base path of the FHIR Server to be queried, e.g.: 'https://example.com/r4/' | No        |     |
+| --fhir-server-user     | retrieve.fhirServerUser      | Username for basic auth protected communication with FHIR Server     | Yes       |         |
+| --fhir-server-pass     | retrieve.fhirServerPass      | Password for basic auth protected communication with FHIR Server     | Yes       |         |
+| --fhir-server-cacert   | retrieve.fhirServerCACert    | CA Certificate file[^cafile] for https connection to FHIR Server     | Yes       |         |
 
 #### Example
 
@@ -86,7 +86,7 @@ the config file. *CLI opts will override config settings.*
 |------------------------|---------------------|----------------------------------------------------------------------|-----------|---------|
 | --config               |                     | Specify a config file rather than using the default config path      | Yes       | config.toml |
 | --wp                   |                     | Workpackage algorithm to execute, e.g. 'wp-1-1-pilot'                | No        |        | 
-| --version              | site                | Determines which version of the analysis algorithm to use .          | Yes       | latest |
+| --version              | analyze.version     | Determines which version of the analysis algorithm to use            | Yes       | latest |
 
 #### Example
 

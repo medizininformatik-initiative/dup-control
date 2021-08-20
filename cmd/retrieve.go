@@ -12,8 +12,8 @@ import (
 )
 
 type RetrieveOpts struct {
-	Workpackage        string //req
-	Site               string //req
+	workpackage        string //req
+	site               string //req
 	fhirServerEndpoint string
 	fhirServerUser     string
 	fhirServerPass     string
@@ -24,8 +24,8 @@ var retrieveOpts = RetrieveOpts{}
 
 func createRetrieveOpts(retrieveOpts RetrieveOpts) (container.PullOpts, container.RunOpts) {
 	pullOpts := container.PullOpts{
-		Image: retrieveOpts.Workpackage,
-		Tag:   retrieveOpts.Site,
+		Image: retrieveOpts.workpackage,
+		Tag:   retrieveOpts.site,
 	}
 	runOpts := container.RunOpts{
 		Env: []string{
@@ -64,15 +64,15 @@ var retrieveCommand = &cobra.Command{
 	Short: "Retrieve bundles from FHIR server",
 	Long:  "You can retrieve bundles from the FHIR server for a specific POLAR workpackage",
 	PreRunE: func(cmd *cobra.Command, args []string) error {
-		if viper.GetString("fhirServerEndpoint") == "" {
+		if viper.GetString("retrieve.fhirServerEndpoint") == "" {
 			return fmt.Errorf("fhirServerEndpoint not set")
 		} else {
-			retrieveOpts.fhirServerEndpoint = viper.GetString("fhirServerEndpoint")
+			retrieveOpts.fhirServerEndpoint = viper.GetString("retrieve.fhirServerEndpoint")
 		}
-		retrieveOpts.Site = viper.GetString("site")
-		retrieveOpts.fhirServerUser = viper.GetString("fhirServerUser")
-		retrieveOpts.fhirServerPass = viper.GetString("fhirServerPass")
-		retrieveOpts.fhirServerCACert = viper.GetString("fhirServerCACert")
+		retrieveOpts.site = viper.GetString("retrieve.site")
+		retrieveOpts.fhirServerUser = viper.GetString("retrieve.fhirServerUser")
+		retrieveOpts.fhirServerPass = viper.GetString("retrieve.fhirServerPass")
+		retrieveOpts.fhirServerCACert = viper.GetString("retrieve.fhirServerCACert")
 		return nil
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -92,21 +92,21 @@ var retrieveCommand = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(retrieveCommand)
 
-	retrieveCommand.PersistentFlags().StringVar(&retrieveOpts.Workpackage, "wp", "", "Image to execute (e.g. 'wp-1-1-pilot').")
+	retrieveCommand.PersistentFlags().StringVar(&retrieveOpts.workpackage, "wp", "", "Image to execute (e.g. 'wp-1-1-pilot').")
 	_ = retrieveCommand.MarkPersistentFlagRequired("wp")
 
 	retrieveCommand.PersistentFlags().String("site", "latest", "Determines which image to use, as images are (not necessarily) hand-tailored for different dic sites. (e.g. 'dic-giessen', 'dic-leipzig', 'dic-muenchen').")
-	_ = viper.BindPFlag("site", retrieveCommand.PersistentFlags().Lookup("site"))
+	_ = viper.BindPFlag("retrieve.site", retrieveCommand.PersistentFlags().Lookup("site"))
 
 	retrieveCommand.PersistentFlags().String("fhir-server-endpoint", "", "the base URL of the FHIR server to use")
-	_ = viper.BindPFlag("fhirServerEndpoint", retrieveCommand.PersistentFlags().Lookup("fhir-server-endpoint"))
+	_ = viper.BindPFlag("retrieve.fhirServerEndpoint", retrieveCommand.PersistentFlags().Lookup("fhir-server-endpoint"))
 
 	retrieveCommand.PersistentFlags().String("fhir-server-user", "", "fhirServerUser for basic auth protected communication with FHIR server")
-	_ = viper.BindPFlag("fhirServerUser", retrieveCommand.PersistentFlags().Lookup("fhir-server-user"))
+	_ = viper.BindPFlag("retrieve.fhirServerUser", retrieveCommand.PersistentFlags().Lookup("fhir-server-user"))
 
 	retrieveCommand.PersistentFlags().String("fhir-server-pass", "", "fhirServerPass for basic auth protected communication with FHIR server")
-	_ = viper.BindPFlag("fhirServerPass", retrieveCommand.PersistentFlags().Lookup("fhir-server-pass"))
+	_ = viper.BindPFlag("retrieve.fhirServerPass", retrieveCommand.PersistentFlags().Lookup("fhir-server-pass"))
 
 	retrieveCommand.PersistentFlags().String("fhir-server-cacert", "", "CA Certificate file for https connection to FHIR Server")
-	_ = viper.BindPFlag("fhirServerCACert", retrieveCommand.PersistentFlags().Lookup("fhir-server-cacert"))
+	_ = viper.BindPFlag("retrieve.fhirServerCACert", retrieveCommand.PersistentFlags().Lookup("fhir-server-cacert"))
 }
