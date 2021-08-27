@@ -64,6 +64,7 @@ the config file. *CLI opts will override config settings.*
 | --fhir-server-user     | retrieve.fhirServerUser      | Username for basic auth protected communication with FHIR Server     | Yes       |         |
 | --fhir-server-pass     | retrieve.fhirServerPass      | Password for basic auth protected communication with FHIR Server     | Yes       |         |
 | --fhir-server-cacert   | retrieve.fhirServerCACert    | CA Certificate file[^cafile] for https connection to FHIR Server     | Yes       |         |
+| --dev                  |                              | Enables settings for local development                               | Yes       | false   |
 
 #### Example
 
@@ -87,6 +88,7 @@ the config file. *CLI opts will override config settings.*
 | --config               |                     | Specify a config file rather than using the default config path      | Yes       | config.toml |
 | --wp                   |                     | Workpackage algorithm to execute, e.g. 'wp-1-1-pilot'                | No        |        | 
 | --version              | analyze.version     | Determines which version of the analysis algorithm to use            | Yes       | latest |
+| --dev                  |                     | Enables settings for local development                               | Yes       | false  |
 
 #### Example
 

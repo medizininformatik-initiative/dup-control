@@ -18,6 +18,7 @@ type RetrieveOpts struct {
 	fhirServerUser     string
 	fhirServerPass     string
 	fhirServerCACert   string
+	dev                bool
 }
 
 var retrieveOpts = RetrieveOpts{}
@@ -55,6 +56,15 @@ func createRetrieveOpts(retrieveOpts RetrieveOpts) (container.PullOpts, containe
 		} else {
 			log.Errorf("Skipping Certificate Injection: error converting path %s", retrieveOpts.fhirServerCACert)
 		}
+	}
+	if retrieveOpts.dev {
+		pullOpts.Image = "base"
+		pullOpts.Tag = "latest"
+		runOpts.Mounts = append(runOpts.Mounts,
+			container.LocalMount("main.R", true),
+			container.LocalMount("scripts", true),
+			container.LocalMount("assets", true),
+		)
 	}
 	return pullOpts, runOpts
 }
@@ -109,4 +119,6 @@ func init() {
 
 	retrieveCommand.PersistentFlags().String("fhir-server-cacert", "", "CA Certificate file for https connection to FHIR Server")
 	_ = viper.BindPFlag("retrieve.fhirServerCACert", retrieveCommand.PersistentFlags().Lookup("fhir-server-cacert"))
+
+	retrieveCommand.PersistentFlags().BoolVar(&retrieveOpts.dev, "dev", false, "Mounts main.R, scripts/ and assets/ from current working directory for local development.")
 }
