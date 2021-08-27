@@ -13,6 +13,7 @@ import (
 type AnalyzeOpts struct {
 	workpackage string //req
 	version     string
+	dev         bool
 }
 
 var analyzeOpts = AnalyzeOpts{}
@@ -31,6 +32,15 @@ func createAnalyseOpts(analyzeOpts AnalyzeOpts) (container.PullOpts, container.R
 	}
 	if runtime.GOOS != "windows" {
 		runOpts.User = fmt.Sprintf("%d:%d", os.Getuid(), os.Getgid())
+	}
+	if analyzeOpts.dev {
+		pullOpts.Image = "base"
+		pullOpts.Tag = "latest"
+		runOpts.Mounts = append(runOpts.Mounts,
+			container.LocalMount("main.R", true),
+			container.LocalMount("scripts", true),
+			container.LocalMount("assets", true),
+		)
 	}
 	return pullOpts, runOpts
 }
@@ -64,4 +74,6 @@ func init() {
 
 	analyzeCommand.PersistentFlags().String("version", "latest", "Determines which image version to use.")
 	_ = viper.BindPFlag("analyze.version", analyzeCommand.PersistentFlags().Lookup("version"))
+
+	analyzeCommand.PersistentFlags().BoolVar(&analyzeOpts.dev, "dev", false, "Mounts main.R, scripts/ and assets/ from current working directory for local development.")
 }
