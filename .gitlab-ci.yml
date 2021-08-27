@@ -14,7 +14,7 @@ test:
   stage: build
   script:
     - apk add -q --no-cache zip
-    - ./build-releases.sh -e
+    - version="${version}" ./build-releases.sh -e
   artifacts:
     paths:
       - builds/
@@ -30,7 +30,7 @@ build-latest:
 build-branch:
   extends: .build
   before_script:
-    - version="${CI_COMMIT_REF_SLUG}"
+    - version="branch-${CI_COMMIT_REF_SLUG}"
   only:
     - branches
   except:
@@ -39,6 +39,6 @@ build-branch:
 build-tag:
   extends: .build
   before_script:
-    - version="$(echo ${CI_COMMIT_TAG} | cut -c 2-)"
+    - version="${CI_COMMIT_TAG}"
   only:
     - tags
