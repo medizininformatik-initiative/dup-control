@@ -18,10 +18,9 @@ var rootOpts = RootOpts{}
 type RootOpts struct{}
 
 var rootCmd = &cobra.Command{
-	Use:     "polarctl",
-	Short:   "Control POLAR",
-	Long:    `polarctl....`,
-	Version: "0.1",
+	Use:   "polarctl",
+	Short: "Control POLAR",
+	Long:  `polarctl....`,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		if cli, err := docker.NewClientFromEnv(); err != nil {
 			return fmt.Errorf("cannot instantiate docker client, %w", err)
@@ -34,7 +33,8 @@ var rootCmd = &cobra.Command{
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
-func Execute() {
+func Execute(version string) {
+	rootCmd.Version = version
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
