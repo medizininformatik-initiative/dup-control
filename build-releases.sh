@@ -4,22 +4,12 @@ mkdir -p builds
 
 export CGO_ENABLED=0
 
-GOOS=linux   GOARCH=amd64 go build -ldflags "-X main.Version=${version}"
-tar czf builds/polarctl-${version}-linux-amd64.tar.gz polarctl
-rm polarctl
+GOOS=linux   GOARCH=amd64 go build -ldflags "-X main.Version=${version}" -o builds/polarctl-linux-amd64
 
-GOOS=linux   GOARCH=arm64 go build -ldflags "-X main.Version=${version}"
-tar czf builds/polarctl-${version}-linux-arm64.tar.gz polarctl
-rm polarctl
+GOOS=linux   GOARCH=arm64 go build -ldflags "-X main.Version=${version}" -o builds/polarctl-linux-arm64
 
-GOOS=darwin  GOARCH=amd64 go build -ldflags "-X main.Version=${version}"
-tar czf builds/polarctl-${version}-darwin-amd64.tar.gz polarctl
-rm polarctl
+GOOS=darwin  GOARCH=amd64 go build -ldflags "-X main.Version=${version}" -o builds/polarctl-darwin-amd64
 
-GOOS=darwin  GOARCH=arm64 go build -ldflags "-X main.Version=${version}"
-tar czf builds/polarctl-${version}-darwin-arm64.tar.gz polarctl
-rm polarctl
+GOOS=darwin  GOARCH=arm64 go build -ldflags "-X main.Version=${version}" -o builds/polarctl-darwin-arm64
 
-GOOS=windows GOARCH=amd64 go build -ldflags "-X main.Version=${version}"
-zip -q builds/polarctl-${version}-windows-amd64.zip polarctl.exe
-rm polarctl.exe
+GOOS=windows GOARCH=amd64 go build -ldflags "-X main.Version=${version}" -o builds/polarctl-windows-amd64.exe
