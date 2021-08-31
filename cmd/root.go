@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"git.smith.care/smith/uc-phep/polar/polarctl/util/container"
+	"git.smith.care/smith/uc-phep/polar/polarctl/util/upgrade"
 	docker "github.com/fsouza/go-dockerclient"
 	"github.com/op/go-logging"
 	"github.com/spf13/cobra"
@@ -10,17 +11,22 @@ import (
 	"os"
 )
 
+const baseURL = "https://polarctl.s3.amazonaws.com"
+
 var log = logging.MustGetLogger("cmd")
 var containerRuntime *container.Runtime
 var cfgFile string
 var rootOpts = RootOpts{}
+var updater *upgrade.Updater
+var Version = ""
 
 type RootOpts struct{}
 
 var rootCmd = &cobra.Command{
-	Use:   "polarctl",
-	Short: "Control POLAR",
-	Long:  `polarctl....`,
+	Use:     "polarctl",
+	Short:   "Control POLAR",
+	Long:    `polarctl....`,
+	Version: Version,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		if cli, err := docker.NewClientFromEnv(); err != nil {
 			return fmt.Errorf("cannot instantiate docker client, %w", err)
@@ -33,8 +39,7 @@ var rootCmd = &cobra.Command{
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
-func Execute(version string) {
-	rootCmd.Version = version
+func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -43,6 +48,7 @@ func Execute(version string) {
 
 func init() {
 	cobra.OnInitialize(initConfig)
+	updater = checkForUpdates()
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "config.toml", "Config file")
 }
