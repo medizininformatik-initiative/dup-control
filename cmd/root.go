@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"os"
+	"runtime"
 )
 
 const baseURL = "https://polarctl.s3.amazonaws.com"
@@ -46,11 +47,32 @@ func Execute() {
 	}
 }
 
+func initUpdater() *upgrade.Updater {
+	updater, err := upgrade.NewUpdater(baseURL, sprintReleaseKey(runtime.GOOS, runtime.GOARCH), "VERSION", Version)
+	if err != nil {
+		log.Fatalf("Error creating polarctl updater, %s", err.Error())
+	}
+	return updater
+}
+
+func checkForUpdates() {
+	if !viper.GetBool("disableUpdateCheck") {
+		available, remoteVersion := updater.IsNewerVersionAvailable()
+		if available {
+			log.Infof("polarctl version %s available, use `polarctl upgrade` to download and replace your current version", remoteVersion)
+		}
+	} else {
+		log.Debugf("Upgrade checks disabled")
+	}
+}
+
 func init() {
-	cobra.OnInitialize(initConfig)
-	updater = checkForUpdates()
+	updater = initUpdater()
+	cobra.OnInitialize(initConfig, checkForUpdates)
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "config.toml", "Config file")
+	rootCmd.PersistentFlags().Bool("disable-update-check", false, "Disable upgrade check on startup")
+	_ = viper.BindPFlag("disableUpdateCheck", rootCmd.PersistentFlags().Lookup("disable-update-check"))
 }
 
 func initConfig() {
