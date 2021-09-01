@@ -14,14 +14,13 @@ import (
 
 const baseURL = "https://polarctl.s3.amazonaws.com"
 
-var log = logging.MustGetLogger("cmd")
-var containerRuntime *container.Runtime
-var cfgFile string
-var rootOpts = RootOpts{}
-var updater *upgrade.Updater
-var Version = ""
-
-type RootOpts struct{}
+var (
+	log              = logging.MustGetLogger("cmd")
+	containerRuntime *container.Runtime
+	cfgFile          string
+	updater          *upgrade.Updater
+	Version          = ""
+)
 
 var rootCmd = &cobra.Command{
 	Use:     "polarctl",
