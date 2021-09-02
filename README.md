@@ -5,6 +5,12 @@ execution using docker.
 
 ## Installation
 
+### Prerequisites
+
+#### Uninstall polarctl v1
+
+Uninstall the old version of polarctl (if installed) using the provided `uninstall.sh`/`uninstall.ps1` (see [polarctl v1][polarctl-v1]).
+
 ### Download the Latest Version
 
 | Operating System | AMD64 Processor Architecture ([?][wiki-amd64]) | ARM64 Processor Architecture ([?][wiki-arm64]) |
@@ -108,6 +114,7 @@ polarctl analyze --wp wp-1-1-pilot --version "1.0"
 
 
 [polar]: https://www.medizininformatik-initiative.de/de/POLAR
+[polarctl-v1]: https://git.smith.care/smith/uc-phep/polar/polar-control
 
 [wiki-amd64]: https://en.wikipedia.org/wiki/X86-64#AMD64
 [wiki-arm64]: https://de.wikipedia.org/wiki/Arm-Architektur#Armv8-A_(2011)
