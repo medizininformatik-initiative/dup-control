@@ -1,25 +1,16 @@
 #!/usr/bin/env sh
 
 mkdir -p builds
-
 export CGO_ENABLED=0
 
-GOOS=linux   GOARCH=amd64 go build -ldflags "-X main.Version=${version}"
-tar czf builds/polarctl-${version}-linux-amd64.tar.gz polarctl
-rm polarctl
+build() {
+  GOOS=${1} GOARCH=${2} go build \
+    -ldflags "-X git.smith.care/smith/uc-phep/polar/polarctl/cmd.Version=${version}" \
+    -o "builds/polarctl-${1}-${2}"
+}
 
-GOOS=linux   GOARCH=arm64 go build -ldflags "-X main.Version=${version}"
-tar czf builds/polarctl-${version}-linux-arm64.tar.gz polarctl
-rm polarctl
-
-GOOS=darwin  GOARCH=amd64 go build -ldflags "-X main.Version=${version}"
-tar czf builds/polarctl-${version}-darwin-amd64.tar.gz polarctl
-rm polarctl
-
-GOOS=darwin  GOARCH=arm64 go build -ldflags "-X main.Version=${version}"
-tar czf builds/polarctl-${version}-darwin-arm64.tar.gz polarctl
-rm polarctl
-
-GOOS=windows GOARCH=amd64 go build -ldflags "-X main.Version=${version}"
-zip -q builds/polarctl-${version}-windows-amd64.zip polarctl.exe
-rm polarctl.exe
+build linux amd64
+build linux arm64
+build darwin amd64
+build darwin arm64
+build windows amd64

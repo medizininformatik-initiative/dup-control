@@ -13,7 +13,7 @@ execution using docker.
 
 ### Windows
 
-Unpack the downloaded archive and move `polarctl.exe` into a directory in your PATH (`echo $env:PATH` (PowerShell)). 
+Move the downloaded `polarctl.exe` into a directory in your PATH (`echo $env:PATH` (PowerShell)). 
 
 * using `C:\Windows\System32\` will enable polarctl for all users. *Note: Access to C:\Windows\System32\ may require administrator access privileges.*
 * using `C:\Users\%USERNAME%\AppData\Local\Microsoft\WindowsApps` will enable polarctl for the current user. *Note: Make sure the directory is in your PATH!*
@@ -22,7 +22,7 @@ polarctl can then be executed via cmd or powershell.
 
 ### Linux / macOS
 
-Unpack the downloaded archive and move `polarctl` into a directory in your PATH (`echo $PATH`).
+Move the downloaded `polarctl` binary into a directory in your PATH (`echo $PATH`).
 
 ```shell
 sudo mv polarctl /usr/local/bin/polarctl
@@ -44,6 +44,16 @@ registryUser = "polar-dic-<site>"
 registryPass = "<password>"
 ```
 
+### Global Settings
+
+Some settings can be set via CLI flag or config file. The table below lists the flags and corresponding keys for
+the config file. *CLI opts will override config settings.*
+
+| CLI Flag               | Config Key          | Description                                                          | Optional? | Default |
+|------------------------|---------------------|----------------------------------------------------------------------|-----------|---------|
+| --config               |                     | Specify a config file rather than using the default config path      | Yes       | config.toml |
+| --disable-update-check | disableUpdateCheck  | Disable upgrade check on startup                                     | Yes       | false  |
+
 ### Retrieval
 
 ```shell
@@ -57,7 +67,6 @@ the config file. *CLI opts will override config settings.*
 
 | CLI Flag               | Config Key                   | Description                                                          | Optional? | Default |
 |------------------------|------------------------------|----------------------------------------------------------------------|-----------|---------|
-| --config               |                              | Specify a config file rather than using the default config path      | Yes       | config.toml |
 | --wp                   |                              | Workpackage algorithm to execute, e.g. 'wp-1-1-pilot'                | No        |     | 
 | --site                 | retrieve.site                | Determines which image to use, as images are (not necessarily) hand-tailored for different dic sites. (e.g. 'dic-giessen', 'dic-leipzig', 'dic-muenchen'). | Yes        | latest |
 | --fhir-server-endpoint | retrieve.fhirServerEndpoint  | URL including base path of the FHIR Server to be queried, e.g.: 'https://example.com/r4/' | No        |     |
@@ -85,7 +94,6 @@ the config file. *CLI opts will override config settings.*
 
 | CLI Flag               | Config Key          | Description                                                          | Optional? | Default |
 |------------------------|---------------------|----------------------------------------------------------------------|-----------|---------|
-| --config               |                     | Specify a config file rather than using the default config path      | Yes       | config.toml |
 | --wp                   |                     | Workpackage algorithm to execute, e.g. 'wp-1-1-pilot'                | No        |        | 
 | --version              | analyze.version     | Determines which version of the analysis algorithm to use            | Yes       | latest |
 | --dev                  |                     | Enables settings for local development                               | Yes       | false  |
@@ -99,8 +107,8 @@ polarctl analyze --wp wp-1-1-pilot --version "1.0"
 
 [polar]: https://www.medizininformatik-initiative.de/de/POLAR
 
-[windows-amd64]: https://git.smith.care/smith/uc-phep/polar/polar-control-2/-/jobs/artifacts/main/raw/builds/polarctl--windows-amd64.zip?job=build-branch
-[linux-amd64]: https://git.smith.care/smith/uc-phep/polar/polar-control-2/-/jobs/artifacts/main/raw/builds/polarctl--linux-amd64.tar.gz?job=build-branch
-[linux-arm64]: https://git.smith.care/smith/uc-phep/polar/polar-control-2/-/jobs/artifacts/main/raw/builds/polarctl--linux-arm64.tar.gz?job=build-branch
-[darwin-amd64]: https://git.smith.care/smith/uc-phep/polar/polar-control-2/-/jobs/artifacts/main/raw/builds/polarctl--darwin-amd64.tar.gz?job=build-branch
-[darwin-arm64]: https://git.smith.care/smith/uc-phep/polar/polar-control-2/-/jobs/artifacts/main/raw/builds/polarctl--darwin-arm64.tar.gz?job=build-branch
+[windows-amd64]: https://git.smith.care/smith/uc-phep/polar/polar-control-2/-/jobs/artifacts/main/raw/builds/polarctl-windows-amd64.exe?job=build-branch
+[linux-amd64]: https://git.smith.care/smith/uc-phep/polar/polar-control-2/-/jobs/artifacts/main/raw/builds/polarctl-linux-amd64?job=build-branch
+[linux-arm64]: https://git.smith.care/smith/uc-phep/polar/polar-control-2/-/jobs/artifacts/main/raw/builds/polarctl-linux-arm64?job=build-branch
+[darwin-amd64]: https://git.smith.care/smith/uc-phep/polar/polar-control-2/-/jobs/artifacts/main/raw/builds/polarctl-darwin-amd64?job=build-branch
+[darwin-arm64]: https://git.smith.care/smith/uc-phep/polar/polar-control-2/-/jobs/artifacts/main/raw/builds/polarctl-darwin-arm64?job=build-branch

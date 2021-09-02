@@ -1,44 +1,56 @@
 image: golang:1.16-alpine
 
 stages:
-  - test
-  - build
+- test
+- build
+- deploy
 
 test:
   stage: test
   script:
-    - apk add -q --no-cache build-base
-    - go test -v ./...
+  - apk add -q --no-cache build-base
+  - go test -v ./...
 
 .build:
   stage: build
   script:
-    - apk add -q --no-cache zip
-    - version="${version}" ./build-releases.sh -e
+  - apk add -q --no-cache zip
+  - version="${version}" ./build-releases.sh -e
   artifacts:
     paths:
-      - builds/
+    - builds/
     expose_as: Binaries
 
 build-latest:
   extends: .build
   before_script:
-    - version="latest"
+  - version="latest"
   only:
-    - master
+  - master
 
 build-branch:
   extends: .build
   before_script:
-    - version="branch-${CI_COMMIT_REF_SLUG}"
+  - version="branch-${CI_COMMIT_REF_SLUG}"
   only:
-    - branches
+  - branches
   except:
-    - master
+  - master
 
 build-tag:
   extends: .build
   before_script:
-    - version="${CI_COMMIT_TAG}"
+  - version="${CI_COMMIT_TAG}"
   only:
-    - tags
+  - tags
+
+deploy-tag:
+  stage: deploy
+  image:
+    name: amazon/aws-cli
+    entrypoint: [""]
+  script:
+  - echo "${CI_COMMIT_TAG}" > builds/VERSION
+  - aws s3 cp builds/ s3://polarctl/ --recursive --include "*"
+  only:
+  - tags
