@@ -7,9 +7,11 @@ execution using docker.
 
 ### Download the Latest Version
 
-* [Windows][windows-amd64]
-* [Linux][linux-amd64] ([arm][linux-arm64])
-* [MacOS][darwin-amd64] ([arm][darwin-arm64])
+| Operating System | AMD64 Processor Architecture ([?][wiki-amd64]) | ARM64 Processor Architecture ([?][wiki-arm64]) |
+|------------------|------------------------------------------------|------------------------------------------------|
+| Windows          | [Download][windows-amd64]                      | -                                              |
+| Linux            | [Download][linux-amd64]                        | [Download][linux-arm64]                        |
+| MacOS            | [Download][darwin-amd64]                       | [Download][darwin-arm64]                       |
 
 ### Windows
 
@@ -107,8 +109,11 @@ polarctl analyze --wp wp-1-1-pilot --version "1.0"
 
 [polar]: https://www.medizininformatik-initiative.de/de/POLAR
 
-[windows-amd64]: https://git.smith.care/smith/uc-phep/polar/polar-control-2/-/jobs/artifacts/main/raw/builds/polarctl-windows-amd64.exe?job=build-branch
-[linux-amd64]: https://git.smith.care/smith/uc-phep/polar/polar-control-2/-/jobs/artifacts/main/raw/builds/polarctl-linux-amd64?job=build-branch
-[linux-arm64]: https://git.smith.care/smith/uc-phep/polar/polar-control-2/-/jobs/artifacts/main/raw/builds/polarctl-linux-arm64?job=build-branch
-[darwin-amd64]: https://git.smith.care/smith/uc-phep/polar/polar-control-2/-/jobs/artifacts/main/raw/builds/polarctl-darwin-amd64?job=build-branch
-[darwin-arm64]: https://git.smith.care/smith/uc-phep/polar/polar-control-2/-/jobs/artifacts/main/raw/builds/polarctl-darwin-arm64?job=build-branch
+[wiki-amd64]: https://en.wikipedia.org/wiki/X86-64#AMD64
+[wiki-arm64]: https://de.wikipedia.org/wiki/Arm-Architektur#Armv8-A_(2011)
+
+[windows-amd64]: https://polarctl.s3.amazonaws.com/polarctl-windows-amd64.exe
+[linux-amd64]: https://polarctl.s3.amazonaws.com/polarctl-linux-amd64
+[linux-arm64]: https://polarctl.s3.amazonaws.com/polarctl-linux-arm64
+[darwin-amd64]: https://polarctl.s3.amazonaws.com/polarctl-darwin-amd64
+[darwin-arm64]: https://polarctl.s3.amazonaws.com/polarctl-darwin-arm64
