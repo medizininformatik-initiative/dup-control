@@ -51,6 +51,11 @@ deploy-tag:
     entrypoint: [""]
   script:
   - echo "${CI_COMMIT_TAG}" > builds/VERSION
-  - aws s3 cp builds/ s3://polarctl/ --recursive --include "*"
+  - aws s3 cp builds/VERSION                    s3://polarctl/test/
+  - aws s3 cp builds/polarctl-linux-amd64       s3://polarctl/test/ --content-disposition 'attachment; filename="polarctl"'
+  - aws s3 cp builds/polarctl-linux-arm64       s3://polarctl/test/ --content-disposition 'attachment; filename="polarctl"'
+  - aws s3 cp builds/polarctl-darwin-amd64      s3://polarctl/test/ --content-disposition 'attachment; filename="polarctl"'
+  - aws s3 cp builds/polarctl-darwin-arm64      s3://polarctl/test/ --content-disposition 'attachment; filename="polarctl"'
+  - aws s3 cp builds/polarctl-windows-amd64.exe s3://polarctl/test/ --content-disposition 'attachment; filename="polarctl.exe"'
   only:
   - tags
