@@ -14,7 +14,6 @@ test:
 .build:
   stage: build
   script:
-  - apk add -q --no-cache zip
   - version="${version}" ./build-releases.sh -e
   artifacts:
     paths:
