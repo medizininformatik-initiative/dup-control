@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 deploy() {
-  aws s3 cp "builds/polarctl-${1}-${2}" s3://polarctl/ --content-disposition "attachment; filename=\"polarctl${3}\""
+  aws s3 cp "builds/polarctl-${1}-${2}${3}" s3://polarctl/ --content-disposition "attachment; filename=\"polarctl${3}\""
 }
 
 deploy linux amd64
