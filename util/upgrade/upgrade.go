@@ -75,7 +75,7 @@ func (updater *Updater) Upgrade() error {
 	available, remoteVersion := updater.IsNewerVersionAvailable()
 	if available {
 		s := updater.BaseURL.ResolveReference(updater.ReleasePath).String()
-		log.Info("Downloading new version from %s", s)
+		log.Infof("Downloading new version from %s", s)
 		resp, err := http.Get(s)
 		if err != nil {
 			return err
