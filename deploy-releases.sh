@@ -1,5 +1,7 @@
 #!/usr/bin/env sh
 
+aws s3 cp "builds/VERSION" s3://polarctl/
+
 deploy() {
   aws s3 cp "builds/polarctl-${1}-${2}${3}" s3://polarctl/ --content-disposition "attachment; filename=\"polarctl${3}\""
 }
