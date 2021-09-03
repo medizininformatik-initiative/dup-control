@@ -68,7 +68,7 @@ func (updater *Updater) IsNewerVersionAvailable() (bool, string) {
 		log.Errorf("New version of polarctl was invalid, '%s'", remoteVersion)
 		return false, ""
 	}
-	return semver.Compare(updater.CurrentVersion, remoteVersion) <= 0, remoteVersion
+	return semver.Compare(updater.CurrentVersion, remoteVersion) < 0, remoteVersion
 }
 
 func (updater *Updater) Upgrade() error {
