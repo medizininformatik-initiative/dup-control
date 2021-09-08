@@ -23,22 +23,22 @@ type Updater struct {
 
 func NewUpdater(baseUrl string, releasePath string, versionPath string, currentVersion string) (*Updater, error) {
 	if !semver.IsValid(currentVersion) {
-		return nil, fmt.Errorf("invalid currentVersion")
+		return nil, fmt.Errorf("invalid currentVersion: %s", currentVersion)
 	}
 
 	parsedBaseURL, err := url.Parse(baseUrl)
 	if err != nil || !parsedBaseURL.IsAbs() {
-		return nil, fmt.Errorf("invalid baseUrl")
+		return nil, fmt.Errorf("invalid baseUrl: %s", baseUrl)
 	}
 
 	parsedReleasePath, err := url.Parse(releasePath)
 	if err != nil {
-		return nil, fmt.Errorf("invalid releasePath")
+		return nil, fmt.Errorf("invalid releasePath: %s", releasePath)
 	}
 
 	parsedVersionPath, err := url.Parse(versionPath)
 	if err != nil {
-		return nil, fmt.Errorf("invalid versionPath")
+		return nil, fmt.Errorf("invalid versionPath: %s", versionPath)
 	}
 
 	return &Updater{
