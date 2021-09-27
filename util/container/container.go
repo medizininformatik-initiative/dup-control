@@ -124,12 +124,16 @@ func (runtime *Runtime) remove(container *docker.Container, opts *RemoveOpts) {
 	}
 }
 
-func LocalMount(dir string, rw bool) docker.HostMount {
+func LocalMount(dirName string, rw bool) docker.HostMount {
 	workdir, _ := os.Getwd()
 	path, _ := filepath.Abs(workdir)
+	dir := filepath.Join(path, dirName)
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		_ = os.Mkdir(dir, os.ModePerm)
+	}
 	return docker.HostMount{
-		Source:   filepath.Join(path, dir),
-		Target:   fmt.Sprintf("/polar/%s", dir),
+		Source:   dir,
+		Target:   fmt.Sprintf("/polar/%s", dirName),
 		Type:     "bind",
 		ReadOnly: !rw}
 }
