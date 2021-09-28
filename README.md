@@ -7,6 +7,10 @@ execution using docker.
 
 ### Prerequisites
 
+#### Docker
+
+Docker must be installed on the system. Please follow the [official installation instructions][docker-install].
+
 #### Uninstall polarctl v1
 
 Uninstall the old version of polarctl (if installed) using the provided `uninstall.sh`/`uninstall.ps1` (see [polarctl v1][polarctl-v1]).
@@ -115,6 +119,7 @@ polarctl analyze --wp wp-1-1-pilot --version "1.0"
 
 
 [polar]: https://www.medizininformatik-initiative.de/de/POLAR
+[docker-install]: https://docs.docker.com/get-docker/
 [polarctl-v1]: https://git.smith.care/smith/uc-phep/polar/polar-control
 
 [wiki-amd64]: https://en.wikipedia.org/wiki/X86-64#AMD64
