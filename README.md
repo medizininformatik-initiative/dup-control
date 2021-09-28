@@ -86,7 +86,7 @@ the config file. *CLI opts will override config settings.*
 #### Example
 
 ```shell
-polarctl retrieve --wp wp-1-1-pilot --fhir-server-endpoint "https://mii-agiop-3p.life.uni-leipzig.de/fhir/" --site "dic-giessen"
+polarctl retrieve --wp wp-1-1-pilot --fhir-server-endpoint "https://mii-agiop-3p.life.uni-leipzig.de/fhir/"
 ```
 
 ### Analysis
