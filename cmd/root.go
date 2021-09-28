@@ -19,7 +19,7 @@ var (
 	containerRuntime *container.Runtime
 	cfgFile          string
 	updater          *upgrade.Updater
-	Version          = ""
+	Version          = "v999.99"
 )
 
 var rootCmd = &cobra.Command{
