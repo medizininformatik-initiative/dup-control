@@ -34,6 +34,7 @@ Move the downloaded `polarctl` binary into a directory in your PATH (`echo $PATH
 
 ```shell
 sudo mv polarctl /usr/local/bin/polarctl
+sudo chmod +x /usr/local/bin/polarctl
 ```
 
 ## Usage
