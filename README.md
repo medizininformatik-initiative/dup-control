@@ -9,7 +9,9 @@ execution using docker.
 
 #### Docker
 
-Docker must be installed on the system. Please follow the [official installation instructions][docker-install].
+* Docker must be installed on the system. Please follow the [official installation instructions][docker-install].
+* Also consider allowing your non-root Linux user to use docker (and polarctl) by adding it to the docker group 
+(see [docker docs][docker-ugroup]) otherwise only a root user will be able to execute polarctl. 
 
 #### Uninstall polarctl v1
 
@@ -120,6 +122,7 @@ polarctl analyze --wp wp-1-1-pilot --version "1.0"
 
 [polar]: https://www.medizininformatik-initiative.de/de/POLAR
 [docker-install]: https://docs.docker.com/get-docker/
+[docker-ugroup]: https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user
 [polarctl-v1]: https://git.smith.care/smith/uc-phep/polar/polar-control
 
 [wiki-amd64]: https://en.wikipedia.org/wiki/X86-64#AMD64
