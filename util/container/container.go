@@ -135,5 +135,6 @@ func LocalMount(dirName string, rw bool) docker.HostMount {
 		Source:   dir,
 		Target:   fmt.Sprintf("/polar/%s", dirName),
 		Type:     "bind",
-		ReadOnly: !rw}
+		ReadOnly: !rw,
+	}
 }
