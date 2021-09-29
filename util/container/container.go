@@ -51,13 +51,18 @@ type PullOpts struct {
 }
 
 func (runtime *Runtime) Pull(pullOpts PullOpts) error {
+	imageName := sprintRepositoryName(pullOpts.Image)
 	opts := docker.PullImageOptions{
 		Context:      runtime.context,
-		Repository:   sprintRepositoryName(pullOpts.Image),
+		Repository:   imageName,
 		Tag:          pullOpts.Tag,
 		OutputStream: os.Stdout,
 	}
-	return runtime.client.PullImage(opts, runtime.authConfig)
+	if err := runtime.client.PullImage(opts, runtime.authConfig); err != nil {
+		return fmt.Errorf("unable to pull image %s:%s, %w", imageName, pullOpts.Tag, err)
+	} else {
+		return nil
+	}
 }
 
 type RunOpts struct {
@@ -80,9 +85,10 @@ func containerHostConfigFromOpts(opts RunOpts) *docker.HostConfig {
 
 func (runtime *Runtime) Run(containerNamePrefix string, pullOpts PullOpts, runOpts RunOpts) error {
 	removeOpts := RemoveOpts{Force: false}
+	containerName := sprintContainerName(containerNamePrefix, pullOpts.Image, pullOpts.Tag)
 	containerOpts := docker.CreateContainerOptions{
 		Context:    runtime.context,
-		Name:       sprintContainerName(containerNamePrefix, pullOpts.Image, pullOpts.Tag),
+		Name:       containerName,
 		Config:     containerConfigFromOpts(pullOpts, runOpts),
 		HostConfig: containerHostConfigFromOpts(runOpts),
 	}
@@ -105,8 +111,11 @@ func (runtime *Runtime) Run(containerNamePrefix string, pullOpts PullOpts, runOp
 			removeOpts.Force = true
 		}
 	}
-
-	return err
+	if err != nil {
+		return fmt.Errorf("unable to start container %s, %w", containerName, err)
+	} else {
+		return nil
+	}
 }
 
 type RemoveOpts struct {
@@ -120,7 +129,7 @@ func (runtime *Runtime) remove(container *docker.Container, opts *RemoveOpts) {
 		Force:   opts.Force,
 	}
 	if err := runtime.client.RemoveContainer(removeOpts); err != nil {
-		log.Errorf("Unable to remove container with ID %s, %v", container.ID, err.Error())
+		log.Errorf("Unable to remove container %s, %v", container.Name, err)
 	}
 }
 
