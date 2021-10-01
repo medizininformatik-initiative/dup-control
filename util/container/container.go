@@ -6,6 +6,7 @@ import (
 	docker "github.com/fsouza/go-dockerclient"
 	"github.com/op/go-logging"
 	"os"
+	"os/signal"
 	"path/filepath"
 )
 
@@ -17,6 +18,7 @@ type DockerClient interface {
 	StartContainerWithContext(id string, hostConfig *docker.HostConfig, ctx context.Context) error
 	Logs(opts docker.LogsOptions) error
 	RemoveContainer(opts docker.RemoveContainerOptions) error
+	StopContainerWithContext(id string, timeout uint, ctx context.Context) error
 }
 
 type Runtime struct {
@@ -95,11 +97,13 @@ func (runtime *Runtime) Run(containerNamePrefix string, pullOpts PullOpts, runOp
 	container, err := runtime.client.CreateContainer(containerOpts)
 	if err == nil {
 		defer runtime.remove(container, &removeOpts)
+		runtime.registerInterruptTermination(container)
 		err = runtime.client.StartContainerWithContext(container.ID, nil, runtime.context)
 	}
 
 	if err == nil {
 		logOpts := docker.LogsOptions{
+			Context:      runtime.context,
 			Stdout:       true,
 			Stderr:       true,
 			Container:    container.ID,
@@ -118,6 +122,17 @@ func (runtime *Runtime) Run(containerNamePrefix string, pullOpts PullOpts, runOp
 	}
 }
 
+func (runtime *Runtime) registerInterruptTermination(container *docker.Container) {
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	go func() {
+		<-c
+		log.Infof("Interrupted. Terminating container %s", container.Name)
+		runtime.terminate(container)
+		os.Exit(130)
+	}()
+}
+
 type RemoveOpts struct {
 	Force bool
 }
@@ -130,6 +145,12 @@ func (runtime *Runtime) remove(container *docker.Container, opts *RemoveOpts) {
 	}
 	if err := runtime.client.RemoveContainer(removeOpts); err != nil {
 		log.Errorf("Unable to remove container %s, %v", container.Name, err)
+	}
+}
+
+func (runtime *Runtime) terminate(container *docker.Container) {
+	if err := runtime.client.StopContainerWithContext(container.ID, 0, runtime.context); err != nil {
+		log.Errorf("Unable to stop container %s, %v", container.Name, err)
 	}
 }
 
