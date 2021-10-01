@@ -21,7 +21,7 @@ var upgradeCmd = &cobra.Command{
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {},
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := updater.Upgrade(); err != nil {
-			log.Infof("Error updating polarctl, %s", err.Error())
+			log.Infof("Error updating polarctl: %v", err)
 			os.Exit(1)
 		}
 	},
