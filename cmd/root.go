@@ -19,7 +19,7 @@ var (
 	containerRuntime *container.Runtime
 	cfgFile          string
 	updater          *upgrade.Updater
-	Version          = "v999.99"
+	Version          = "v999.99.99-dev"
 )
 
 var rootCmd = &cobra.Command{
@@ -49,7 +49,7 @@ func Execute() {
 func initUpdater() *upgrade.Updater {
 	updater, err := upgrade.NewUpdater(baseURL, sprintReleaseKey(runtime.GOOS, runtime.GOARCH), "VERSION", Version)
 	if err != nil {
-		log.Fatalf("Error creating polarctl updater, %s", err.Error())
+		log.Fatalf("Error creating polarctl updater: %v", err)
 	}
 	return updater
 }
@@ -80,7 +80,7 @@ func initConfig() {
 		if err := viper.ReadInConfig(); err == nil {
 			log.Debugf("Using config file: %s", viper.ConfigFileUsed())
 		} else {
-			log.Errorf("Error reading config file: %s", err.Error())
+			log.Errorf("Error reading config file: %v", err)
 			os.Exit(3)
 		}
 	}
