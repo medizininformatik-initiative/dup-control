@@ -34,6 +34,11 @@ func (mock *mockClient) StartContainerWithContext(id string, hostConfig *docker.
 	return args.Error(0)
 }
 
+func (mock *mockClient) StopContainerWithContext(id string, timeout uint, ctx context.Context) error {
+	args := mock.Called(id, timeout, ctx)
+	return args.Error(0)
+}
+
 type mockLogOpts struct {
 	Container string
 	Follow    bool
