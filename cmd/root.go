@@ -28,7 +28,11 @@ var rootCmd = &cobra.Command{
 	Long:    `polarctl....`,
 	Version: Version,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		if cli, err := docker.NewClientFromEnv(); err != nil {
+		if viper.GetString("registryUser") == "" {
+			return fmt.Errorf("registryUser not configured. Please check if you are missing the 'config.toml' config file")
+		} else if viper.GetString("registryPass") == "" {
+			return fmt.Errorf("registryPass not configured. Please check if you are missing the 'config.toml' config file")
+		} else if cli, err := docker.NewClientFromEnv(); err != nil {
 			return fmt.Errorf("cannot instantiate docker client, %w", err)
 		} else {
 			containerRuntime = container.NewRuntime(cli, viper.GetString("registryUser"), viper.GetString("registryPass"))
@@ -79,9 +83,6 @@ func initConfig() {
 		viper.SetConfigFile(cfgFile)
 		if err := viper.ReadInConfig(); err == nil {
 			log.Debugf("Using config file: %s", viper.ConfigFileUsed())
-		} else {
-			log.Errorf("Error reading config file: %v", err)
-			os.Exit(3)
 		}
 	}
 }

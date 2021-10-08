@@ -1,4 +1,4 @@
-image: golang:1.17-alpine
+image: golang:1.17
 
 stages:
 - test
@@ -8,7 +8,6 @@ stages:
 test:
   stage: test
   script:
-  - apk add -q --no-cache build-base
   - go test -v ./...
 
 .build:
