@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	coll "git.smith.care/smith/uc-phep/polar/polarctl/util"
 	"git.smith.care/smith/uc-phep/polar/polarctl/util/container"
 	docker "github.com/fsouza/go-dockerclient"
 	"github.com/spf13/cobra"
@@ -14,6 +15,7 @@ type AnalyzeOpts struct {
 	workpackage string //req
 	version     string
 	dev         bool
+	env         map[string]string
 }
 
 var analyzeOpts = AnalyzeOpts{}
@@ -24,7 +26,7 @@ func createAnalyseOpts(analyzeOpts AnalyzeOpts) (container.PullOpts, container.R
 		Tag:   analyzeOpts.version,
 	}
 	runOpts := container.RunOpts{
-		Env: []string{},
+		Env: coll.JoinEntries(analyzeOpts.env, "="),
 		Mounts: []docker.HostMount{
 			container.LocalMount("outputLocal", true),
 			container.LocalMount("outputGlobal", true),
@@ -51,6 +53,7 @@ var analyzeCommand = &cobra.Command{
 	Long:  "You can analyze bundles that have formerly been retrieved from the FHIR server for a specific POLAR workpackage",
 	PreRun: func(cmd *cobra.Command, args []string) {
 		analyzeOpts.version = viper.GetString("analyze.version")
+		analyzeOpts.env = viper.GetStringMapString("analyze.env")
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		pullOpts, runOpts := createAnalyseOpts(analyzeOpts)
@@ -76,4 +79,7 @@ func init() {
 	_ = viper.BindPFlag("analyze.version", analyzeCommand.PersistentFlags().Lookup("version"))
 
 	analyzeCommand.PersistentFlags().BoolVar(&analyzeOpts.dev, "dev", false, "Mounts main.R, scripts/ and assets/ from current working directory for local development.")
+
+	analyzeCommand.PersistentFlags().StringToStringP("env", "e", map[string]string{}, "Accepts key-value pairs in the form of key=value and passes them unchanged to the running scripts")
+	_ = viper.BindPFlag("analyze.env", analyzeCommand.PersistentFlags().Lookup("env"))
 }
