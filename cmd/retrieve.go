@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	coll "git.smith.care/smith/uc-phep/polar/polarctl/util"
 	"git.smith.care/smith/uc-phep/polar/polarctl/util/container"
 	docker "github.com/fsouza/go-dockerclient"
 	"github.com/spf13/cobra"
@@ -19,6 +20,7 @@ type RetrieveOpts struct {
 	fhirServerPass     string
 	fhirServerCACert   string
 	dev                bool
+	env                map[string]string
 }
 
 var retrieveOpts = RetrieveOpts{}
@@ -29,9 +31,8 @@ func createRetrieveOpts(retrieveOpts RetrieveOpts) (container.PullOpts, containe
 		Tag:   retrieveOpts.site,
 	}
 	runOpts := container.RunOpts{
-		Env: []string{
-			fmt.Sprintf("FHIR_ENDPOINT=%s", retrieveOpts.fhirServerEndpoint),
-		},
+		Env: append(coll.JoinEntries(retrieveOpts.env, "="),
+			fmt.Sprintf("FHIR_ENDPOINT=%s", retrieveOpts.fhirServerEndpoint)),
 		Mounts: []docker.HostMount{
 			container.LocalMount("outputLocal", true),
 			container.LocalMount("outputGlobal", true),
@@ -83,6 +84,7 @@ var retrieveCommand = &cobra.Command{
 		retrieveOpts.fhirServerUser = viper.GetString("retrieve.fhirServerUser")
 		retrieveOpts.fhirServerPass = viper.GetString("retrieve.fhirServerPass")
 		retrieveOpts.fhirServerCACert = viper.GetString("retrieve.fhirServerCACert")
+		retrieveOpts.env = viper.GetStringMapString("retrieve.env")
 		return nil
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -121,4 +123,7 @@ func init() {
 	_ = viper.BindPFlag("retrieve.fhirServerCACert", retrieveCommand.PersistentFlags().Lookup("fhir-server-cacert"))
 
 	retrieveCommand.PersistentFlags().BoolVar(&retrieveOpts.dev, "dev", false, "Mounts main.R, scripts/ and assets/ from current working directory for local development.")
+
+	retrieveCommand.PersistentFlags().StringToStringP("env", "e", map[string]string{}, "Accepts key-value pairs in the form of key=value and passes them unchanged to the running scripts")
+	_ = viper.BindPFlag("retrieve.env", retrieveCommand.PersistentFlags().Lookup("env"))
 }

@@ -54,7 +54,7 @@ working directory (cwd) to store results from the executed workpackages and to f
 
 Create a file called `config.toml` within your chosen polar working directory. The minimal configuration contains the polar 
 container registry credentials (formerly used with `docker login` command) in the following form:
-```
+```toml
 registryUser = "polar-dic-<site>"
 registryPass = "<password>"
 ```
@@ -89,6 +89,7 @@ the config file. *CLI opts will override config settings.*
 | --fhir-server-pass     | retrieve.fhirServerPass      | Password for basic auth protected communication with FHIR Server     | Yes       |         |
 | --fhir-server-cacert   | retrieve.fhirServerCACert    | CA Certificate file[^cafile] for https connection to FHIR Server     | Yes       |         |
 | --dev                  |                              | Enables settings for local development                               | Yes       | false   |
+| --env / -e             | retrieve.env                 | Passes environment variables to the workpackage scripts, e.g.: -e "MAX_BUNDLES=5" | Yes       |         |
 
 #### Example
 
@@ -112,6 +113,7 @@ the config file. *CLI opts will override config settings.*
 | --wp                   |                     | Workpackage algorithm to execute, e.g. 'wp-1-1-pilot'                | No        |        | 
 | --version              | analyze.version     | Determines which version of the analysis algorithm to use            | Yes       | latest |
 | --dev                  |                     | Enables settings for local development                               | Yes       | false  |
+| --env / -e             | analyze.env         | Passes environment variables to the workpackage scripts, e.g.: -e "MAX_BUNDLES=5" | Yes       |         |
 
 #### Example
 
@@ -119,6 +121,18 @@ the config file. *CLI opts will override config settings.*
 polarctl analyze --wp wp-1-1-pilot --version "1.0"
 ```
 
+### Example Configuration
+
+```toml
+registryUser = "polar-some-dic"
+registryPass = "some-individual-password"
+
+[retrieve]
+fhirServerEndpoint = "https://example.com/fhir"
+fhirServerUser = "some-fhir-server-user"
+fhirServerPass = "some-fhir-server-pass"
+env = {"MAX_BUNDLES" = "5"}
+```
 
 [polar]: https://www.medizininformatik-initiative.de/de/POLAR
 [docker-install]: https://docs.docker.com/get-docker/
