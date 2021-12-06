@@ -149,7 +149,7 @@ func (runtime *Runtime) remove(container *docker.Container, opts *RemoveOpts) {
 }
 
 func (runtime *Runtime) terminate(container *docker.Container) {
-	if err := runtime.client.StopContainerWithContext(container.ID, 0, runtime.context); err != nil {
+	if err := runtime.client.StopContainerWithContext(container.ID, 10, runtime.context); err != nil {
 		log.Errorf("Unable to stop container %s, %v", container.Name, err)
 	}
 }
