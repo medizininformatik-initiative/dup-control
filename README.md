@@ -134,6 +134,13 @@ fhirServerPass = "some-fhir-server-pass"
 env = {"MAX_BUNDLES" = "5"}
 ```
 
+## Troubleshooting
+
+### Permission denied
+
+Getting a `permission denied` error when using `polarctl upgrade` usually means you require access rights on the 
+currently installed polarctl file. On linux using `sudo polarctl upgrade` should suffice.
+
 [polar]: https://www.medizininformatik-initiative.de/de/POLAR
 [docker-install]: https://docs.docker.com/get-docker/
 [docker-ugroup]: https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user

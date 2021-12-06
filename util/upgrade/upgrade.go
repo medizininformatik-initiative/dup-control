@@ -94,7 +94,11 @@ func (updater *Updater) Upgrade() error {
 		// in case the upgrade fails
 		destBackup := dest + ".bak"
 		if _, err := os.Stat(dest); err == nil {
-			os.Rename(dest, destBackup)
+			if err := os.Rename(dest, destBackup); os.IsPermission(err) {
+				return fmt.Errorf("permission denied, see https://git.smith.care/smith/uc-phep/polar/polar-control-2#permission-denied")
+			} else if err != nil {
+				return err
+			}
 		}
 
 		// Use the same flags that ioutil.WriteFile uses
