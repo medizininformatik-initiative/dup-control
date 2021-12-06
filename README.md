@@ -34,6 +34,14 @@ Move the downloaded `polarctl.exe` into a directory in your [PATH][wiki-path] (`
 
 polarctl can then be executed via cmd or powershell. 
 
+**Download using Command Line (Windows)**
+
+You can also download the executable using a command line:
+
+```shell
+curl https://polarctl.s3.amazonaws.com/polarctl-windows-amd64.exe -O polarctl.exe
+```
+
 ### Linux / macOS
 
 Move the downloaded `polarctl` binary into a directory in your [PATH][wiki-path] (`echo $PATH`).
@@ -41,6 +49,14 @@ Move the downloaded `polarctl` binary into a directory in your [PATH][wiki-path]
 ```shell
 sudo mv polarctl /usr/local/bin/polarctl
 sudo chmod +x /usr/local/bin/polarctl
+```
+
+**Download using Command Line (Linux/macOS)**
+
+You can also download the executable using a command line, fill in the appropriate link from the [download table](#download-the-latest-version).
+
+```shell
+curl [link] -O polarctl
 ```
 
 ## Usage
