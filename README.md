@@ -59,6 +59,9 @@ registryUser = "polar-dic-<site>"
 registryPass = "<password>"
 ```
 
+*Note: POLAR Container Registry Credentials are provided per DIC by the UC PheP Development Team. Please contact
+[Jonas Wagner](mailto:jwagner@life.uni-leipzig.de) or [Frank Meineke](mailto:Frank.Meineke@imise.uni-leipzig.de).*
+
 ### Global Settings
 
 Some settings can be set via CLI flag or config file. The table below lists the flags and corresponding keys for
