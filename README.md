@@ -27,16 +27,16 @@ Uninstall the old version of polarctl (if installed) using the provided `uninsta
 
 ### Windows
 
-Move the downloaded `polarctl.exe` into a directory in your PATH (`echo $env:PATH` (PowerShell)). 
+Move the downloaded `polarctl.exe` into a directory in your [PATH][wiki-path] (`echo $env:PATH` (PowerShell)). 
 
 * using `C:\Windows\System32\` will enable polarctl for all users. *Note: Access to C:\Windows\System32\ may require administrator access privileges.*
-* using `C:\Users\%USERNAME%\AppData\Local\Microsoft\WindowsApps` will enable polarctl for the current user. *Note: Make sure the directory is in your PATH!*
+* using `C:\Users\%USERNAME%\AppData\Local\Microsoft\WindowsApps` will enable polarctl for the current user. *Note: Make sure the directory is in your [PATH][wiki-path] (see `echo $env:PATH` (PowerShell))!*
 
 polarctl can then be executed via cmd or powershell. 
 
 ### Linux / macOS
 
-Move the downloaded `polarctl` binary into a directory in your PATH (`echo $PATH`).
+Move the downloaded `polarctl` binary into a directory in your [PATH][wiki-path] (`echo $PATH`).
 
 ```shell
 sudo mv polarctl /usr/local/bin/polarctl
@@ -151,6 +151,7 @@ currently installed polarctl file. On linux using `sudo polarctl upgrade` should
 
 [wiki-amd64]: https://en.wikipedia.org/wiki/X86-64#AMD64
 [wiki-arm64]: https://de.wikipedia.org/wiki/Arm-Architektur#Armv8-A_(2011)
+[wiki-path]: https://en.wikipedia.org/wiki/PATH_(variable)
 
 [windows-amd64]: https://polarctl.s3.amazonaws.com/polarctl-windows-amd64.exe
 [linux-amd64]: https://polarctl.s3.amazonaws.com/polarctl-linux-amd64
