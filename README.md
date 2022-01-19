@@ -87,6 +87,7 @@ the config file. *CLI opts will override config settings.*
 |------------------------|--------------------|------------------------------------------------------------------|-----------|-------------|
 | --config               |                    | Specify a config file rather than using the default config path  | Yes       | config.toml |
 | --disable-update-check | disableUpdateCheck | Disable upgrade check on startup                                 | Yes       | false       |
+| --offline              | offline            | Assumes an air-gapped environment (No Update Check / Image Pull) | Yes       | false       |
 
 ### Retrieval
 

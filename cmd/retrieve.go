@@ -100,8 +100,12 @@ var retrieveCommand = &cobra.Command{
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		pullOpts, runOpts := createRetrieveOpts(retrieveOpts)
-		if err := containerRuntime.Pull(pullOpts); err != nil {
-			return err
+		if !viper.GetBool("offline") {
+			if err := containerRuntime.Pull(pullOpts); err != nil {
+				return err
+			}
+		} else {
+			log.Infof("Skip image pull due to --offline mode")
 		}
 
 		if err := containerRuntime.Run("retrieval", pullOpts, runOpts); err != nil {

@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"os"
 )
 
@@ -19,11 +20,16 @@ var upgradeCmd = &cobra.Command{
 	Short:            "Upgrade polarctl",
 	Long:             "You can upgrade your polarctl installation with the most recent version",
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {},
-	Run: func(cmd *cobra.Command, args []string) {
-		if err := updater.Upgrade(); err != nil {
-			log.Infof("Error updating polarctl: %v", err)
-			os.Exit(1)
+	RunE: func(cmd *cobra.Command, args []string) error {
+		if !viper.GetBool("offline") {
+			if err := updater.Upgrade(); err != nil {
+				log.Infof("Error updating polarctl: %v", err)
+				os.Exit(1)
+			}
+		} else {
+			return fmt.Errorf("cannot upgrade in --offline mode")
 		}
+		return nil
 	},
 }
 
