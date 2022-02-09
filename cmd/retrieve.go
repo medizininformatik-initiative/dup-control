@@ -14,7 +14,7 @@ import (
 
 type RetrieveOpts struct {
 	workpackage        string //req
-	site               string //req
+	version            string //req
 	fhirServerEndpoint string
 	fhirServerUser     string
 	fhirServerPass     string
@@ -28,7 +28,7 @@ var retrieveOpts = RetrieveOpts{}
 func createRetrieveOpts(retrieveOpts RetrieveOpts) (container.PullOpts, container.RunOpts) {
 	pullOpts := container.PullOpts{
 		Image: retrieveOpts.workpackage,
-		Tag:   retrieveOpts.site,
+		Tag:   retrieveOpts.version,
 	}
 	runOpts := container.RunOpts{
 		Env: append(coll.JoinEntries(retrieveOpts.env, "="),
@@ -80,7 +80,12 @@ var retrieveCommand = &cobra.Command{
 		} else {
 			retrieveOpts.fhirServerEndpoint = viper.GetString("retrieve.fhirServerEndpoint")
 		}
-		retrieveOpts.site = viper.GetString("retrieve.site")
+		if site := viper.GetString("retrieve.site"); site != "latest" {
+			log.Warningf("--site flag / retrieve.site option is deprecated! Use --version flag / retrieve.version option instead!")
+			retrieveOpts.version = site
+		} else {
+			retrieveOpts.version = viper.GetString("retrieve.version")
+		}
 		retrieveOpts.fhirServerUser = viper.GetString("retrieve.fhirServerUser")
 		retrieveOpts.fhirServerPass = viper.GetString("retrieve.fhirServerPass")
 		retrieveOpts.fhirServerCACert = viper.GetString("retrieve.fhirServerCACert")
@@ -107,7 +112,9 @@ func init() {
 	retrieveCommand.PersistentFlags().StringVar(&retrieveOpts.workpackage, "wp", "", "Image to execute (e.g. 'wp-1-1-pilot').")
 	_ = retrieveCommand.MarkPersistentFlagRequired("wp")
 
-	retrieveCommand.PersistentFlags().String("site", "latest", "Determines which image to use, as images are (not necessarily) hand-tailored for different dic sites. (e.g. 'dic-giessen', 'dic-leipzig', 'dic-muenchen').")
+	retrieveCommand.PersistentFlags().String("version", "latest", "Determines which image to use, as images can be versioned or hand-tailored for different dic sites. (e.g. '0.1', 'dic-giessen', 'dic-leipzig', 'dic-muenchen').")
+	_ = viper.BindPFlag("retrieve.version", retrieveCommand.PersistentFlags().Lookup("version"))
+	retrieveCommand.PersistentFlags().String("site", "latest", "Determines which image to use, as images can be hand-tailored for different dic sites. (e.g. 'dic-giessen', 'dic-leipzig', 'dic-muenchen'). DEPRECATED! Use --version instead!")
 	_ = viper.BindPFlag("retrieve.site", retrieveCommand.PersistentFlags().Lookup("site"))
 
 	retrieveCommand.PersistentFlags().String("fhir-server-endpoint", "", "the base URL of the FHIR server to use")
