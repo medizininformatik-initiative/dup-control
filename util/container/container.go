@@ -17,7 +17,6 @@ type DockerClient interface {
 	CreateContainer(opts docker.CreateContainerOptions) (*docker.Container, error)
 	StartContainerWithContext(id string, hostConfig *docker.HostConfig, ctx context.Context) error
 	Logs(opts docker.LogsOptions) error
-	RemoveContainer(opts docker.RemoveContainerOptions) error
 	StopContainerWithContext(id string, timeout uint, ctx context.Context) error
 }
 
@@ -82,11 +81,13 @@ func containerConfigFromOpts(pullOpts PullOpts, runOpts RunOpts) *docker.Config 
 }
 
 func containerHostConfigFromOpts(opts RunOpts) *docker.HostConfig {
-	return &docker.HostConfig{Mounts: opts.Mounts}
+	return &docker.HostConfig{
+		Mounts:     opts.Mounts,
+		AutoRemove: true,
+	}
 }
 
 func (runtime *Runtime) Run(containerNamePrefix string, pullOpts PullOpts, runOpts RunOpts) error {
-	removeOpts := RemoveOpts{Force: false}
 	containerName := sprintContainerName(containerNamePrefix, pullOpts.Image, pullOpts.Tag)
 	containerOpts := docker.CreateContainerOptions{
 		Context:    runtime.context,
@@ -96,7 +97,7 @@ func (runtime *Runtime) Run(containerNamePrefix string, pullOpts PullOpts, runOp
 	}
 	container, err := runtime.client.CreateContainer(containerOpts)
 	if err == nil {
-		defer runtime.remove(container, &removeOpts)
+		defer runtime.terminate(container)
 		runtime.registerInterruptTermination(container)
 		err = runtime.client.StartContainerWithContext(container.ID, nil, runtime.context)
 	}
@@ -111,9 +112,7 @@ func (runtime *Runtime) Run(containerNamePrefix string, pullOpts PullOpts, runOp
 			ErrorStream:  os.Stderr,
 			Follow:       true,
 		}
-		if err = runtime.client.Logs(logOpts); err != nil {
-			removeOpts.Force = true
-		}
+		err = runtime.client.Logs(logOpts)
 	}
 	if err != nil {
 		return fmt.Errorf("unable to start container %s, %w", containerName, err)
@@ -131,21 +130,6 @@ func (runtime *Runtime) registerInterruptTermination(container *docker.Container
 		runtime.terminate(container)
 		os.Exit(130)
 	}()
-}
-
-type RemoveOpts struct {
-	Force bool
-}
-
-func (runtime *Runtime) remove(container *docker.Container, opts *RemoveOpts) {
-	removeOpts := docker.RemoveContainerOptions{
-		Context: runtime.context,
-		ID:      container.ID,
-		Force:   opts.Force,
-	}
-	if err := runtime.client.RemoveContainer(removeOpts); err != nil {
-		log.Errorf("Unable to remove container %s, %v", container.Name, err)
-	}
 }
 
 func (runtime *Runtime) terminate(container *docker.Container) {

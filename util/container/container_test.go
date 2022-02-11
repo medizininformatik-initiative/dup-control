@@ -50,17 +50,6 @@ func (mock *mockClient) Logs(opts docker.LogsOptions) error {
 	return args.Error(0)
 }
 
-type mockRemoveOpts struct {
-	ID    string
-	Force bool
-}
-
-func (mock *mockClient) RemoveContainer(opts docker.RemoveContainerOptions) error {
-	mockOpts := mockRemoveOpts{ID: opts.ID, Force: opts.Force}
-	args := mock.Called(mockOpts)
-	return args.Error(0)
-}
-
 const pass = "some-pass"
 const user = "some-user"
 const dic = "dic-anywhere"
@@ -99,8 +88,8 @@ func TestRun(t *testing.T) {
 		id, mock.Anything, mock.Anything).Return(nil)
 	dockerMock.On("Logs",
 		mockLogOpts{Container: id, Follow: true}).Return(nil)
-	dockerMock.On("RemoveContainer",
-		mockRemoveOpts{ID: id, Force: false}).Return(nil)
+	dockerMock.On("StopContainerWithContext",
+		id, uint(10), mock.Anything).Return(nil)
 
 	_ = runtime.Run("prefix",
 		PullOpts{Image: "wp-0", Tag: dic},
@@ -133,8 +122,8 @@ func TestRunWithStartError(t *testing.T) {
 		mock.Anything).Return(&docker.Container{ID: id}, nil)
 	dockerMock.On("StartContainerWithContext",
 		id, mock.Anything, mock.Anything).Return(errors.New("unable to start container"))
-	dockerMock.On("RemoveContainer",
-		mockRemoveOpts{ID: id, Force: false}).Return(nil)
+	dockerMock.On("StopContainerWithContext",
+		id, uint(10), mock.Anything).Return(nil)
 
 	err := runtime.Run("prefix",
 		PullOpts{Image: "wp-0", Tag: dic},
@@ -155,8 +144,8 @@ func TestRunWithLogError(t *testing.T) {
 		id, mock.Anything, mock.Anything).Return(nil)
 	dockerMock.On("Logs",
 		mockLogOpts{Container: id, Follow: true}).Return(errors.New("unable to get container logs"))
-	dockerMock.On("RemoveContainer",
-		mockRemoveOpts{ID: id, Force: true}).Return(nil)
+	dockerMock.On("StopContainerWithContext",
+		id, uint(10), mock.Anything).Return(nil)
 
 	err := runtime.Run("prefix",
 		PullOpts{Image: "wp-0", Tag: dic},
