@@ -59,7 +59,7 @@ func initUpdater() *upgrade.Updater {
 }
 
 func checkForUpdates() {
-	if !viper.GetBool("disableUpdateCheck") {
+	if !viper.GetBool("disableUpdateCheck") && !viper.GetBool("offline") {
 		available, remoteVersion := updater.IsNewerVersionAvailable()
 		if available {
 			log.Infof("polarctl version %s available, use `polarctl upgrade` to download and replace your current version", remoteVersion)
@@ -76,6 +76,8 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "config.toml", "Config file")
 	rootCmd.PersistentFlags().Bool("disable-update-check", false, "Disable upgrade check on startup")
 	_ = viper.BindPFlag("disableUpdateCheck", rootCmd.PersistentFlags().Lookup("disable-update-check"))
+	rootCmd.PersistentFlags().Bool("offline", false, "Assumes an air-gapped environment.")
+	_ = viper.BindPFlag("offline", rootCmd.PersistentFlags().Lookup("offline"))
 }
 
 func initConfig() {

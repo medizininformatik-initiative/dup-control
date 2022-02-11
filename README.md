@@ -19,11 +19,11 @@ Uninstall the old version of polarctl (if installed) using the provided `uninsta
 
 ### Download the Latest Version
 
-| Operating System | AMD64 Processor Architecture ([?][wiki-amd64]) | ARM64 Processor Architecture ([?][wiki-arm64]) |
-|------------------|------------------------------------------------|------------------------------------------------|
-| Windows          | [Download][windows-amd64]                      | -                                              |
-| Linux            | [Download][linux-amd64]                        | [Download][linux-arm64]                        |
-| MacOS            | [Download][darwin-amd64]                       | [Download][darwin-arm64]                       |
+| Operating System | AMD64 Processor Architecture ([?][wiki-amd64]) | ARM64 Processor Architecture ([?][wiki-arm64])  |
+|------------------|------------------------------------------------|-------------------------------------------------|
+| Windows          | [Download][windows-amd64]                      | -                                               |
+| Linux            | [Download][linux-amd64]                        | [Download][linux-arm64]                         |
+| MacOS            | [Download][darwin-amd64]                       | [Download][darwin-arm64]                        |
 
 ### Windows
 
@@ -83,10 +83,11 @@ registryPass = "<password>"
 Some settings can be set via CLI flag or config file. The table below lists the flags and corresponding keys for
 the config file. *CLI opts will override config settings.*
 
-| CLI Flag               | Config Key          | Description                                                          | Optional? | Default |
-|------------------------|---------------------|----------------------------------------------------------------------|-----------|---------|
-| --config               |                     | Specify a config file rather than using the default config path      | Yes       | config.toml |
-| --disable-update-check | disableUpdateCheck  | Disable upgrade check on startup                                     | Yes       | false  |
+| CLI Flag               | Config Key         | Description                                                      | Optional? | Default     |
+|------------------------|--------------------|------------------------------------------------------------------|-----------|-------------|
+| --config               |                    | Specify a config file rather than using the default config path  | Yes       | config.toml |
+| --disable-update-check | disableUpdateCheck | Disable upgrade check on startup                                 | Yes       | false       |
+| --offline              | offline            | Assumes an air-gapped environment (No Update Check / Image Pull) | Yes       | false       |
 
 ### Retrieval
 
@@ -129,12 +130,12 @@ polarctl analyze --wp <workpackage> [flags]
 Some settings can be set via CLI flag or config file. The table below lists the flags and corresponding keys for
 the config file. *CLI opts will override config settings.*
 
-| CLI Flag               | Config Key          | Description                                                          | Optional? | Default |
-|------------------------|---------------------|----------------------------------------------------------------------|-----------|---------|
-| --wp                   |                     | Workpackage algorithm to execute, e.g. 'wp-1-1-pilot'                | No        |        | 
-| --version              | analyze.version     | Determines which version of the analysis algorithm to use            | Yes       | latest |
-| --dev                  |                     | Enables settings for local development                               | Yes       | false  |
-| --env / -e             | analyze.env         | Passes environment variables to the workpackage scripts, e.g.: -e "MAX_BUNDLES=5" | Yes       |         |
+| CLI Flag   | Config Key      | Description                                                                       | Optional? | Default |
+|------------|-----------------|-----------------------------------------------------------------------------------|-----------|---------|
+| --wp       |                 | Workpackage algorithm to execute, e.g. 'wp-1-1-pilot'                             | No        |         | 
+| --version  | analyze.version | Determines which version of the analysis algorithm to use                         | Yes       | latest  |
+| --dev      |                 | Enables settings for local development                                            | Yes       | false   |
+| --env / -e | analyze.env     | Passes environment variables to the workpackage scripts, e.g.: -e "MAX_BUNDLES=5" | Yes       |         |
 
 #### Example
 
