@@ -41,6 +41,7 @@ func createRetrieveOpts(retrieveOpts RetrieveOpts) (container.PullOpts, containe
 	}
 	if runtime.GOOS != "windows" {
 		runOpts.User = fmt.Sprintf("%d:%d", os.Getuid(), os.Getgid())
+		runOpts.Env = append(runOpts.Env, "TERM=xterm-256color")
 	}
 	if retrieveOpts.fhirServerUser != "" && retrieveOpts.fhirServerPass != "" {
 		runOpts.Env = append(runOpts.Env,
