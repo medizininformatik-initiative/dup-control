@@ -9,7 +9,16 @@ import (
 	"os"
 )
 
-func UpgradeCommand(log *logging.Logger, updater *upgrade.Updater) *cobra.Command {
+type upgradeCommand struct {
+	log     *logging.Logger
+	updater *upgrade.Updater
+}
+
+func NewUpgradeCommand(log *logging.Logger, updater *upgrade.Updater) *upgradeCommand {
+	return &upgradeCommand{log: log, updater: updater}
+}
+
+func (c *upgradeCommand) Command() *cobra.Command {
 	return &cobra.Command{
 		Use:              "upgrade",
 		Short:            "Upgrade polarctl",
@@ -17,8 +26,8 @@ func UpgradeCommand(log *logging.Logger, updater *upgrade.Updater) *cobra.Comman
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if !viper.GetBool("offline") {
-				if err := updater.Upgrade(); err != nil {
-					log.Infof("Error updating polarctl: %v", err)
+				if err := c.updater.Upgrade(); err != nil {
+					c.log.Infof("Error updating polarctl: %v", err)
 					os.Exit(1)
 				}
 			} else {

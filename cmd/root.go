@@ -68,16 +68,16 @@ func init() {
 	rootCmd.PersistentFlags().Bool("offline", false, "Assumes an air-gapped environment.")
 	_ = viper.BindPFlag("offline", rootCmd.PersistentFlags().Lookup("offline"))
 
-	provider := &runtimeProvider{}
-	rootCmd.AddCommand(run.AnalyzeCommand(log, provider))
-	rootCmd.AddCommand(run.RetrieveCommand(log, provider))
-	rootCmd.AddCommand(util.UpgradeCommand(log, updater))
+	crp := &containerRuntimeProvider{}
+	rootCmd.AddCommand(run.NewAnalyzeCommand(log, crp).Command())
+	rootCmd.AddCommand(run.NewRetrieveCommand(log, crp).Command())
+	rootCmd.AddCommand(util.NewUpgradeCommand(log, updater).Command())
 }
 
-type runtimeProvider struct {
+type containerRuntimeProvider struct {
 }
 
-func (p *runtimeProvider) CreateRuntime() (*container.Runtime, error) {
+func (p *containerRuntimeProvider) CreateRuntime() (*container.Runtime, error) {
 	if viper.GetString("registryUser") == "" {
 		return nil, fmt.Errorf("registryUser not configured. Please check if you are missing the 'config.toml' config file")
 	} else if viper.GetString("registryPass") == "" {

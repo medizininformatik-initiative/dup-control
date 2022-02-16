@@ -12,16 +12,25 @@ import (
 	"runtime"
 )
 
-type AnalyzeOpts struct {
+type analyzeOpts struct {
 	workpackage string //req
 	version     string
 	dev         bool
 	env         map[string]string
 }
 
-var analyzeOpts = AnalyzeOpts{}
+type analyzeCommand struct {
+	log *logging.Logger
+	crp container.RuntimeProvider
 
-func createAnalyseOpts(analyzeOpts AnalyzeOpts) (container.PullOpts, container.RunOpts) {
+	analyzeOpts analyzeOpts
+}
+
+func NewAnalyzeCommand(log *logging.Logger, crp container.RuntimeProvider) *analyzeCommand {
+	return &analyzeCommand{log: log, crp: crp, analyzeOpts: analyzeOpts{}}
+}
+
+func (c *analyzeCommand) createAnalyseOpts(analyzeOpts analyzeOpts) (container.PullOpts, container.RunOpts) {
 	pullOpts := container.PullOpts{
 		Image: fmt.Sprintf("%s-analysis", analyzeOpts.workpackage),
 		Tag:   analyzeOpts.version,
@@ -49,28 +58,28 @@ func createAnalyseOpts(analyzeOpts AnalyzeOpts) (container.PullOpts, container.R
 	return pullOpts, runOpts
 }
 
-func AnalyzeCommand(log *logging.Logger, crp container.RuntimeProvider) *cobra.Command {
+func (c *analyzeCommand) Command() *cobra.Command {
 	command := &cobra.Command{
 		Use:   "analyze",
 		Short: "Analyze bundles retrieved from FHIR server",
 		Long:  "You can analyze bundles that have formerly been retrieved from the FHIR server for a specific POLAR workpackage",
 		PreRun: func(cmd *cobra.Command, args []string) {
-			analyzeOpts.version = viper.GetString("analyze.version")
-			analyzeOpts.env = viper.GetStringMapString("analyze.env")
+			c.analyzeOpts.version = viper.GetString("analyze.version")
+			c.analyzeOpts.env = viper.GetStringMapString("analyze.env")
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			containerRuntime, err := crp.CreateRuntime()
+			containerRuntime, err := c.crp.CreateRuntime()
 			if err != nil {
-				log.Fatalf("Unable to create ContainerRuntime, %w", err)
+				c.log.Fatalf("Unable to create ContainerRuntime, %w", err)
 			}
 
-			pullOpts, runOpts := createAnalyseOpts(analyzeOpts)
+			pullOpts, runOpts := c.createAnalyseOpts(c.analyzeOpts)
 			if !viper.GetBool("offline") {
 				if err := containerRuntime.Pull(pullOpts); err != nil {
 					return err
 				}
 			} else {
-				log.Infof("Skip image pull due to --offline mode")
+				c.log.Infof("Skip image pull due to --offline mode")
 			}
 
 			if err := containerRuntime.Run("analysis", pullOpts, runOpts); err != nil {
@@ -81,13 +90,13 @@ func AnalyzeCommand(log *logging.Logger, crp container.RuntimeProvider) *cobra.C
 		},
 	}
 
-	command.PersistentFlags().StringVar(&analyzeOpts.workpackage, "wp", "", "Image to execute (e.g. 'wp-1-1-pilot').")
+	command.PersistentFlags().StringVar(&c.analyzeOpts.workpackage, "wp", "", "Image to execute (e.g. 'wp-1-1-pilot').")
 	_ = command.MarkPersistentFlagRequired("wp")
 
 	command.PersistentFlags().String("version", "latest", "Determines which image version to use.")
 	_ = viper.BindPFlag("analyze.version", command.PersistentFlags().Lookup("version"))
 
-	command.PersistentFlags().BoolVar(&analyzeOpts.dev, "dev", false, "Mounts main.R, scripts/ and assets/ from current working directory for local development.")
+	command.PersistentFlags().BoolVar(&c.analyzeOpts.dev, "dev", false, "Mounts main.R, scripts/ and assets/ from current working directory for local development.")
 
 	command.PersistentFlags().StringToStringP("env", "e", map[string]string{}, "Accepts key-value pairs in the form of key=value and passes them unchanged to the running scripts")
 	_ = viper.BindPFlag("analyze.env", command.PersistentFlags().Lookup("env"))
