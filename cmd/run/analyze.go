@@ -5,6 +5,7 @@ import (
 	coll "git.smith.care/smith/uc-phep/polar/polarctl/util"
 	"git.smith.care/smith/uc-phep/polar/polarctl/util/container"
 	docker "github.com/fsouza/go-dockerclient"
+	"github.com/op/go-logging"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"os"
@@ -34,6 +35,7 @@ func createAnalyseOpts(analyzeOpts AnalyzeOpts) (container.PullOpts, container.R
 	}
 	if runtime.GOOS != "windows" {
 		runOpts.User = fmt.Sprintf("%d:%d", os.Getuid(), os.Getgid())
+		runOpts.Env = append(runOpts.Env, "TERM=xterm-256color")
 	}
 	if analyzeOpts.dev {
 		pullOpts.Image = "base"
@@ -47,43 +49,48 @@ func createAnalyseOpts(analyzeOpts AnalyzeOpts) (container.PullOpts, container.R
 	return pullOpts, runOpts
 }
 
-var analyzeCommand = &cobra.Command{
-	Use:   "analyze",
-	Short: "Analyze bundles retrieved from FHIR server",
-	Long:  "You can analyze bundles that have formerly been retrieved from the FHIR server for a specific POLAR workpackage",
-	PreRun: func(cmd *cobra.Command, args []string) {
-		analyzeOpts.version = viper.GetString("analyze.version")
-		analyzeOpts.env = viper.GetStringMapString("analyze.env")
-	},
-	RunE: func(cmd *cobra.Command, args []string) error {
-		pullOpts, runOpts := createAnalyseOpts(analyzeOpts)
-		if !viper.GetBool("offline") {
-			if err := containerRuntime.Pull(pullOpts); err != nil {
+func AnalyzeCommand(log *logging.Logger, crp container.RuntimeProvider) *cobra.Command {
+	command := &cobra.Command{
+		Use:   "analyze",
+		Short: "Analyze bundles retrieved from FHIR server",
+		Long:  "You can analyze bundles that have formerly been retrieved from the FHIR server for a specific POLAR workpackage",
+		PreRun: func(cmd *cobra.Command, args []string) {
+			analyzeOpts.version = viper.GetString("analyze.version")
+			analyzeOpts.env = viper.GetStringMapString("analyze.env")
+		},
+		RunE: func(cmd *cobra.Command, args []string) error {
+			containerRuntime, err := crp.CreateRuntime()
+			if err != nil {
+				log.Fatalf("Unable to create ContainerRuntime, %w", err)
+			}
+
+			pullOpts, runOpts := createAnalyseOpts(analyzeOpts)
+			if !viper.GetBool("offline") {
+				if err := containerRuntime.Pull(pullOpts); err != nil {
+					return err
+				}
+			} else {
+				log.Infof("Skip image pull due to --offline mode")
+			}
+
+			if err := containerRuntime.Run("analysis", pullOpts, runOpts); err != nil {
 				return err
 			}
-		} else {
-			log.Infof("Skip image pull due to --offline mode")
-		}
 
-		if err := containerRuntime.Run("analysis", pullOpts, runOpts); err != nil {
-			return err
-		}
+			return nil
+		},
+	}
 
-		return nil
-	},
-}
+	command.PersistentFlags().StringVar(&analyzeOpts.workpackage, "wp", "", "Image to execute (e.g. 'wp-1-1-pilot').")
+	_ = command.MarkPersistentFlagRequired("wp")
 
-func init() {
-	rootCmd.AddCommand(analyzeCommand)
+	command.PersistentFlags().String("version", "latest", "Determines which image version to use.")
+	_ = viper.BindPFlag("analyze.version", command.PersistentFlags().Lookup("version"))
 
-	analyzeCommand.PersistentFlags().StringVar(&analyzeOpts.workpackage, "wp", "", "Image to execute (e.g. 'wp-1-1-pilot').")
-	_ = analyzeCommand.MarkPersistentFlagRequired("wp")
+	command.PersistentFlags().BoolVar(&analyzeOpts.dev, "dev", false, "Mounts main.R, scripts/ and assets/ from current working directory for local development.")
 
-	analyzeCommand.PersistentFlags().String("version", "latest", "Determines which image version to use.")
-	_ = viper.BindPFlag("analyze.version", analyzeCommand.PersistentFlags().Lookup("version"))
+	command.PersistentFlags().StringToStringP("env", "e", map[string]string{}, "Accepts key-value pairs in the form of key=value and passes them unchanged to the running scripts")
+	_ = viper.BindPFlag("analyze.env", command.PersistentFlags().Lookup("env"))
 
-	analyzeCommand.PersistentFlags().BoolVar(&analyzeOpts.dev, "dev", false, "Mounts main.R, scripts/ and assets/ from current working directory for local development.")
-
-	analyzeCommand.PersistentFlags().StringToStringP("env", "e", map[string]string{}, "Accepts key-value pairs in the form of key=value and passes them unchanged to the running scripts")
-	_ = viper.BindPFlag("analyze.env", analyzeCommand.PersistentFlags().Lookup("env"))
+	return command
 }

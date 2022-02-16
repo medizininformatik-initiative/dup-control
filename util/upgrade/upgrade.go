@@ -21,7 +21,17 @@ type Updater struct {
 	VersionPath    *url.URL
 }
 
-func NewUpdater(baseUrl string, releasePath string, versionPath string, currentVersion string) (*Updater, error) {
+func SprintReleaseKey(os string, arch string) string {
+	if os != "windows" {
+		return fmt.Sprintf("polarctl-%s-%s", os, arch)
+	} else {
+		return fmt.Sprintf("polarctl-%s-%s.exe", os, arch)
+	}
+}
+
+func NewUpdater(baseUrl string, os string, arch string, versionPath string, currentVersion string) (*Updater, error) {
+	releasePath := SprintReleaseKey(os, arch)
+
 	if !semver.IsValid(currentVersion) {
 		return nil, fmt.Errorf("invalid currentVersion: %s", currentVersion)
 	}

@@ -152,3 +152,7 @@ func LocalMount(dirName string, rw bool) docker.HostMount {
 		ReadOnly: !rw,
 	}
 }
+
+type RuntimeProvider interface {
+	CreateRuntime() (*Runtime, error)
+}
