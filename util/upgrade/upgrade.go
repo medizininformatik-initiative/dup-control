@@ -14,7 +14,12 @@ import (
 
 var log = logging.MustGetLogger("util.upgrade")
 
-type Updater struct {
+type Updater interface {
+	IsNewerVersionAvailable() (bool, string)
+	Upgrade() error
+}
+
+type DefaultUpdater struct {
 	CurrentVersion string
 	BaseURL        *url.URL
 	ReleasePath    *url.URL
@@ -29,7 +34,7 @@ func SprintReleaseKey(os string, arch string) string {
 	}
 }
 
-func NewUpdater(baseUrl string, os string, arch string, versionPath string, currentVersion string) (*Updater, error) {
+func NewUpdater(baseUrl string, os string, arch string, versionPath string, currentVersion string) (Updater, error) {
 	releasePath := SprintReleaseKey(os, arch)
 
 	if !semver.IsValid(currentVersion) {
@@ -51,7 +56,7 @@ func NewUpdater(baseUrl string, os string, arch string, versionPath string, curr
 		return nil, fmt.Errorf("invalid versionPath: %s", versionPath)
 	}
 
-	return &Updater{
+	return &DefaultUpdater{
 		CurrentVersion: currentVersion,
 		BaseURL:        parsedBaseURL,
 		ReleasePath:    parsedReleasePath,
@@ -59,7 +64,7 @@ func NewUpdater(baseUrl string, os string, arch string, versionPath string, curr
 	}, nil
 }
 
-func (updater *Updater) IsNewerVersionAvailable() (bool, string) {
+func (updater *DefaultUpdater) IsNewerVersionAvailable() (bool, string) {
 	resp, err := http.Get(updater.BaseURL.ResolveReference(updater.VersionPath).String())
 	if err != nil {
 		log.Errorf("Error searching for new version of polarctl", err)
@@ -81,7 +86,7 @@ func (updater *Updater) IsNewerVersionAvailable() (bool, string) {
 	return semver.Compare(updater.CurrentVersion, remoteVersion) < 0, remoteVersion
 }
 
-func (updater *Updater) Upgrade() error {
+func (updater *DefaultUpdater) Upgrade() error {
 	available, remoteVersion := updater.IsNewerVersionAvailable()
 	if available {
 		s := updater.BaseURL.ResolveReference(updater.ReleasePath).String()

@@ -11,10 +11,10 @@ import (
 
 type upgradeCommand struct {
 	log     *logging.Logger
-	updater *upgrade.Updater
+	updater upgrade.Updater
 }
 
-func NewUpgradeCommand(log *logging.Logger, updater *upgrade.Updater) *upgradeCommand {
+func NewUpgradeCommand(log *logging.Logger, updater upgrade.Updater) *upgradeCommand {
 	return &upgradeCommand{log: log, updater: updater}
 }
 

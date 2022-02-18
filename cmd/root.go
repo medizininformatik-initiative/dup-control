@@ -38,7 +38,7 @@ func Execute() {
 	}
 }
 
-func initUpdater() *upgrade.Updater {
+func initUpdater() upgrade.Updater {
 	updater, err := upgrade.NewUpdater(baseURL, runtime.GOOS, runtime.GOARCH, "VERSION", Version)
 	if err != nil {
 		log.Fatalf("Error creating polarctl updater: %v", err)
@@ -46,7 +46,7 @@ func initUpdater() *upgrade.Updater {
 	return updater
 }
 
-func checkForUpdates(updater *upgrade.Updater) {
+func checkForUpdates(updater upgrade.Updater) {
 	if !viper.GetBool("disableUpdateCheck") && !viper.GetBool("offline") {
 		available, remoteVersion := updater.IsNewerVersionAvailable()
 		if available {
