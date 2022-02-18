@@ -1,4 +1,4 @@
-package coll
+package util
 
 import (
 	"fmt"

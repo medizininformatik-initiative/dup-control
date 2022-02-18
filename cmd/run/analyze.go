@@ -2,7 +2,7 @@ package run
 
 import (
 	"fmt"
-	coll "git.smith.care/smith/uc-phep/polar/polarctl/util"
+	"git.smith.care/smith/uc-phep/polar/polarctl/util"
 	"git.smith.care/smith/uc-phep/polar/polarctl/util/container"
 	docker "github.com/fsouza/go-dockerclient"
 	"github.com/op/go-logging"
@@ -36,7 +36,7 @@ func (c *analyzeCommand) createAnalyseOpts(analyzeOpts analyzeOpts) (container.P
 		Tag:   analyzeOpts.version,
 	}
 	runOpts := container.RunOpts{
-		Env: coll.JoinEntries(analyzeOpts.env, "="),
+		Env: util.JoinEntries(analyzeOpts.env, "="),
 		Mounts: []docker.HostMount{
 			container.LocalMount("outputLocal", true),
 			container.LocalMount("outputGlobal", true),
@@ -70,20 +70,20 @@ func (c *analyzeCommand) Command() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			containerRuntime, err := c.crp.CreateRuntime()
 			if err != nil {
-				c.log.Fatalf("Unable to create ContainerRuntime, %w", err)
+				return util.ExecutionError(cmd, "Unable to create ContainerRuntime, %w", err)
 			}
 
 			pullOpts, runOpts := c.createAnalyseOpts(c.analyzeOpts)
 			if !viper.GetBool("offline") {
 				if err := containerRuntime.Pull(pullOpts); err != nil {
-					return err
+					return util.ExecutionError(cmd, "Error pulling analysis image, %w", err)
 				}
 			} else {
 				c.log.Infof("Skip image pull due to --offline mode")
 			}
 
 			if err := containerRuntime.Run("analysis", pullOpts, runOpts); err != nil {
-				return err
+				return util.ExecutionError(cmd, "Error running analysis container, %w", err)
 			}
 
 			return nil
