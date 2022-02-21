@@ -2,8 +2,8 @@ package util
 
 import (
 	"fmt"
-	"git.smith.care/smith/uc-phep/polar/polarctl/util"
-	"git.smith.care/smith/uc-phep/polar/polarctl/util/upgrade"
+	. "git.smith.care/smith/uc-phep/polar/polarctl/lib/cli"
+	"git.smith.care/smith/uc-phep/polar/polarctl/lib/upgrade"
 	"github.com/op/go-logging"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -27,7 +27,7 @@ func (c *upgradeCommand) Command() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if !viper.GetBool("offline") {
 				if err := c.updater.Upgrade(); err != nil {
-					return util.ExecutionError(cmd, "error updating polarctl: %w", err)
+					return ExecutionError(cmd, "error updating polarctl: %w", err)
 				}
 			} else {
 				return fmt.Errorf("cannot upgrade in --offline mode")

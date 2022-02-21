@@ -2,8 +2,9 @@ package run
 
 import (
 	"fmt"
-	"git.smith.care/smith/uc-phep/polar/polarctl/util"
-	"git.smith.care/smith/uc-phep/polar/polarctl/util/container"
+	. "git.smith.care/smith/uc-phep/polar/polarctl/lib/cli"
+	"git.smith.care/smith/uc-phep/polar/polarctl/lib/coll"
+	"git.smith.care/smith/uc-phep/polar/polarctl/lib/container"
 	docker "github.com/fsouza/go-dockerclient"
 	"github.com/op/go-logging"
 	"github.com/spf13/cobra"
@@ -42,7 +43,7 @@ func (c *retrieveCommand) createRetrieveOpts(retrieveOpts retrieveOpts) (contain
 		Tag:   retrieveOpts.version,
 	}
 	runOpts := container.RunOpts{
-		Env: append(util.JoinEntries(retrieveOpts.env, "="),
+		Env: append(coll.JoinEntries(retrieveOpts.env, "="),
 			fmt.Sprintf("FHIR_ENDPOINT=%s", retrieveOpts.fhirServerEndpoint)),
 		Mounts: []docker.HostMount{
 			container.LocalMount("outputLocal", true),
@@ -113,20 +114,20 @@ func (c *retrieveCommand) Command() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			containerRuntime, err := c.crp.CreateRuntime()
 			if err != nil {
-				return util.ExecutionError(cmd, "Unable to create ContainerRuntime, %w", err)
+				return ExecutionError(cmd, "Unable to create ContainerRuntime, %w", err)
 			}
 
 			pullOpts, runOpts := c.createRetrieveOpts(c.retrieveOpts)
 			if !viper.GetBool("offline") {
 				if err := containerRuntime.Pull(pullOpts); err != nil {
-					return util.ExecutionError(cmd, "Error pulling  retrieval image, %w", err)
+					return ExecutionError(cmd, "Error pulling  retrieval image, %w", err)
 				}
 			} else {
 				c.log.Infof("Skip image pull due to --offline mode")
 			}
 
 			if err := containerRuntime.Run("retrieval", pullOpts, runOpts); err != nil {
-				return util.ExecutionError(cmd, "Error running retrieval container, %w", err)
+				return ExecutionError(cmd, "Error running retrieval container, %w", err)
 			}
 
 			return nil

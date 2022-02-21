@@ -29,17 +29,6 @@ func setupCommand() (*upgradeCommand, *mockUpdater) {
 	return cmd, updater
 }
 
-func TestOfflineUpgradeFailing(t *testing.T) {
-	cmd, _ := setupCommand()
-
-	command := cmd.Command()
-	command.SetArgs([]string{"--offline"})
-	command.SetOut(bytes.NewBufferString(""))
-	err := command.Execute()
-
-	assert.Error(t, err, "cannot upgrade in --offline mode")
-}
-
 func TestUpgradeFails(t *testing.T) {
 	cmd, updater := setupCommand()
 

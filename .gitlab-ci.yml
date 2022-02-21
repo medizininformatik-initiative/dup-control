@@ -7,8 +7,13 @@ stages:
 
 test:
   stage: test
+  tags:
+  - docker
+  before_script:
+  - apt-get update -qq && apt-get install -yqq gettext-base && rm -rf /var/lib/apt/lists/*
   script:
-  - go test -v ./...
+  - cat integration-test/config.toml.tpl | envsubst > integration-test/config.toml
+  - go test -tags integration -v ./...
 
 .build:
   stage: build
