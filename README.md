@@ -151,7 +151,7 @@ registryPass = "some-individual-password"
 fhirServerEndpoint = "https://example.com/fhir"
 fhirServerUser = "some-fhir-server-user"
 fhirServerPass = "some-fhir-server-pass"
-env = {"MAX_BUNDLES" = "5"}
+env = {"MAX_BUNDLES" = "100", "COUNT" = 200}
 ```
 
 ## Troubleshooting
