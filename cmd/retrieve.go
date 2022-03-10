@@ -19,6 +19,7 @@ type RetrieveOpts struct {
 	fhirServerUser     string
 	fhirServerPass     string
 	fhirServerCACert   string
+	fhirServerToken    string
 	dev                bool
 	env                map[string]string
 }
@@ -58,6 +59,10 @@ func createRetrieveOpts(retrieveOpts RetrieveOpts) (container.PullOpts, containe
 			log.Errorf("Skipping Certificate Injection: error converting path %s", retrieveOpts.fhirServerCACert)
 		}
 	}
+	if retrieveOpts.fhirServerToken != "" {
+		runOpts.Env = append(runOpts.Env,
+			fmt.Sprintf("FHIR_TOKEN=%s", retrieveOpts.fhirServerToken))
+	}
 	if retrieveOpts.dev {
 		pullOpts.Image = "base"
 		pullOpts.Tag = "latest"
@@ -89,6 +94,7 @@ var retrieveCommand = &cobra.Command{
 		retrieveOpts.fhirServerUser = viper.GetString("retrieve.fhirServerUser")
 		retrieveOpts.fhirServerPass = viper.GetString("retrieve.fhirServerPass")
 		retrieveOpts.fhirServerCACert = viper.GetString("retrieve.fhirServerCACert")
+		retrieveOpts.fhirServerToken = viper.GetString("retrieve.fhirServerToken")
 		retrieveOpts.env = viper.GetStringMapString("retrieve.env")
 		return nil
 	},
@@ -128,6 +134,9 @@ func init() {
 
 	retrieveCommand.PersistentFlags().String("fhir-server-cacert", "", "CA Certificate file for https connection to FHIR Server")
 	_ = viper.BindPFlag("retrieve.fhirServerCACert", retrieveCommand.PersistentFlags().Lookup("fhir-server-cacert"))
+
+	retrieveCommand.PersistentFlags().String("fhir-server-token", "", "Token for token based auth protected communication with FHIR Server")
+	_ = viper.BindPFlag("retrieve.fhirServerToken", retrieveCommand.PersistentFlags().Lookup("fhir-server-token"))
 
 	retrieveCommand.PersistentFlags().BoolVar(&retrieveOpts.dev, "dev", false, "Mounts main.R, scripts/ and assets/ from current working directory for local development.")
 
