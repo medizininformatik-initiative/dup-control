@@ -120,10 +120,10 @@ func init() {
 	retrieveCommand.PersistentFlags().String("fhir-server-endpoint", "", "the base URL of the FHIR server to use")
 	_ = viper.BindPFlag("retrieve.fhirServerEndpoint", retrieveCommand.PersistentFlags().Lookup("fhir-server-endpoint"))
 
-	retrieveCommand.PersistentFlags().String("fhir-server-user", "", "fhirServerUser for basic auth protected communication with FHIR server")
+	retrieveCommand.PersistentFlags().String("fhir-server-user", "", "Username for basic auth protected communication with FHIR server")
 	_ = viper.BindPFlag("retrieve.fhirServerUser", retrieveCommand.PersistentFlags().Lookup("fhir-server-user"))
 
-	retrieveCommand.PersistentFlags().String("fhir-server-pass", "", "fhirServerPass for basic auth protected communication with FHIR server")
+	retrieveCommand.PersistentFlags().String("fhir-server-pass", "", "Password for basic auth protected communication with FHIR server")
 	_ = viper.BindPFlag("retrieve.fhirServerPass", retrieveCommand.PersistentFlags().Lookup("fhir-server-pass"))
 
 	retrieveCommand.PersistentFlags().String("fhir-server-cacert", "", "CA Certificate file for https connection to FHIR Server")
