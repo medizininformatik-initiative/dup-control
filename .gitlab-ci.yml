@@ -22,14 +22,18 @@ test:
 build-latest:
   extends: .build
   before_script:
-  - version="latest"
+  - major="$(git describe --tags --abbrev=0 | cut -c 2- | cut -d '.' -f 1)"
+  - minor="$(git describe --tags --abbrev=0 | cut -c 2- | cut -d '.' -f 2)"
+  - version="v${major}.$((${minor:-0}+1)).0-pre+latest"
   only:
   - master
 
 build-branch:
   extends: .build
   before_script:
-  - version="branch-${CI_COMMIT_REF_SLUG}"
+  - major="$(git describe --tags --abbrev=0 | cut -c 2- | cut -d '.' -f 1)"
+  - minor="$(git describe --tags --abbrev=0 | cut -c 2- | cut -d '.' -f 2)"
+  - version="v${major}.$((${minor:-0}+1)).0-pre+branch.${CI_COMMIT_REF_SLUG}"
   only:
   - branches
   except:
