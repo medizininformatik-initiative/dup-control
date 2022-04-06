@@ -13,7 +13,7 @@ import (
 )
 
 func TestRetrieve(t *testing.T) {
-	RemoveImage(d, "registry.gitlab.com/smith-phep/polar/ci-test-dummy:latest")
+	ForceRemoveImage(d, "registry.gitlab.com/smith-phep/polar/ci-test-dummy:latest")
 	exeF := RunAsync(cmd.NewRootCmd().Command(), "retrieve", "--wp", "ci-test-dummy")
 
 	time.Sleep(10 * time.Second)
@@ -26,8 +26,8 @@ func TestRetrieve(t *testing.T) {
 }
 
 func TestRetrieveOfflineFailsWithoutImage(t *testing.T) {
-	RemoveImage(d, "registry.gitlab.com/smith-phep/polar/ci-test-dummy:latest")
-	exe := Run(cmd.NewRootCmd().Command(), "--offline", "retrieve", "--wp", "ci-test-dummy")
+	ForceRemoveImage(d, "registry.gitlab.com/smith-phep/polar/ci-test-dummy:latest")
+	exe := Run(cmd.NewRootCmd().Command(), "--offline", "retrieve", "--wp", "ci-test-dummy", "-e", "SLEEP=10")
 
 	exe.AssertFailure(t)
 	exe.AssertErrContains(t, "no such image")

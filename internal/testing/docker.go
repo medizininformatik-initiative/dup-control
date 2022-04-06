@@ -23,6 +23,8 @@ func KillContainer(d *docker.Client, c *docker.APIContainers) {
 	}
 }
 
-func RemoveImage(d *docker.Client, name string) {
-	_ = d.RemoveImage(name)
+func ForceRemoveImage(d *docker.Client, name string) {
+	_ = d.RemoveImageExtended(name, docker.RemoveImageOptions{
+		Force: true,
+	})
 }
