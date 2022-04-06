@@ -14,14 +14,29 @@ import (
 
 var log = logging.MustGetLogger("util.upgrade")
 
-type Updater struct {
+type Updater interface {
+	IsNewerVersionAvailable() (bool, string)
+	Upgrade() error
+}
+
+type DefaultUpdater struct {
 	CurrentVersion string
 	BaseURL        *url.URL
 	ReleasePath    *url.URL
 	VersionPath    *url.URL
 }
 
-func NewUpdater(baseUrl string, releasePath string, versionPath string, currentVersion string) (*Updater, error) {
+func SprintReleaseKey(os string, arch string) string {
+	if os != "windows" {
+		return fmt.Sprintf("polarctl-%s-%s", os, arch)
+	} else {
+		return fmt.Sprintf("polarctl-%s-%s.exe", os, arch)
+	}
+}
+
+func NewUpdater(baseUrl string, os string, arch string, versionPath string, currentVersion string) (Updater, error) {
+	releasePath := SprintReleaseKey(os, arch)
+
 	if !semver.IsValid(currentVersion) {
 		return nil, fmt.Errorf("invalid currentVersion: %s", currentVersion)
 	}
@@ -41,7 +56,7 @@ func NewUpdater(baseUrl string, releasePath string, versionPath string, currentV
 		return nil, fmt.Errorf("invalid versionPath: %s", versionPath)
 	}
 
-	return &Updater{
+	return &DefaultUpdater{
 		CurrentVersion: currentVersion,
 		BaseURL:        parsedBaseURL,
 		ReleasePath:    parsedReleasePath,
@@ -49,7 +64,7 @@ func NewUpdater(baseUrl string, releasePath string, versionPath string, currentV
 	}, nil
 }
 
-func (updater *Updater) IsNewerVersionAvailable() (bool, string) {
+func (updater *DefaultUpdater) IsNewerVersionAvailable() (bool, string) {
 	resp, err := http.Get(updater.BaseURL.ResolveReference(updater.VersionPath).String())
 	if err != nil {
 		log.Errorf("Error searching for new version of polarctl", err)
@@ -71,7 +86,7 @@ func (updater *Updater) IsNewerVersionAvailable() (bool, string) {
 	return semver.Compare(updater.CurrentVersion, remoteVersion) < 0, remoteVersion
 }
 
-func (updater *Updater) Upgrade() error {
+func (updater *DefaultUpdater) Upgrade() error {
 	available, remoteVersion := updater.IsNewerVersionAvailable()
 	if available {
 		s := updater.BaseURL.ResolveReference(updater.ReleasePath).String()
