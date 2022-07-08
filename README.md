@@ -65,11 +65,15 @@ working directory (cwd) to store results from the executed workpackages and to f
 ### Create dupctl Config
 
 Create a file called `config.toml` within your chosen working directory. The minimal configuration contains the projects 
-container registry credentials (formerly used with `docker login` command) in the following form:
+container registry, the registry credentials (formerly used with `docker login` command) and a project name in the following form:
 ```toml
+project = "some-project"
+registry = "example.com/container-registry"
 registryUser = "<username>"
 registryPass = "<password>"
 ```
+
+*Note: The project name will distinguish docker containers belonging to different projects.*
 
 *Note: Container Registry Credentials are provided per DIC by the UC PheP Development Team. Please contact
 [Jonas Wagner](mailto:jwagner@life.uni-leipzig.de) or [Frank Meineke](mailto:Frank.Meineke@imise.uni-leipzig.de).*

@@ -1,3 +1,5 @@
+project = "polar"
+registry = "registry.gitlab.com/smith-phep/polar"
 registryUser = "${DUPCTL_REGISTRY_USER}"
 registryPass = "${DUPCTL_REGISTRY_PASSWORD}"
 
