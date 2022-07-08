@@ -91,7 +91,7 @@ func (c *retrieveCommand) Command() *cobra.Command {
 	command := &cobra.Command{
 		Use:   "retrieve",
 		Short: "Retrieve bundles from FHIR server",
-		Long:  "You can retrieve bundles from the FHIR server for a specific POLAR workpackage",
+		Long:  "You can retrieve bundles from the FHIR server for a specific dup",
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			if viper.GetString("retrieve.fhirServerEndpoint") == "" {
 				return fmt.Errorf("retrieve.fhirServerEndpoint not set")

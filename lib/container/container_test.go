@@ -51,7 +51,7 @@ func (mock *mockClient) Logs(opts docker.LogsOptions) error {
 }
 
 const registry = "registry.gitlab.com/some-registry"
-const namespace = "polar"
+const namespace = "test"
 const pass = "some-pass"
 const user = "some-user"
 const dic = "dic-anywhere"

@@ -37,7 +37,7 @@ func (c *rootCmd) Command() *cobra.Command {
 
 	command := &cobra.Command{
 		Use:   "dupctl",
-		Short: "Control POLAR",
+		Short: "Execute Data Use Project containers",
 		Long:  `dupctl....`,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			if err := c.initConfig(); err != nil {

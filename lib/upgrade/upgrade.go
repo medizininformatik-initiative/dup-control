@@ -110,7 +110,7 @@ func (updater *DefaultUpdater) Upgrade() error {
 		destBackup := dest + ".bak"
 		if _, err := os.Stat(dest); err == nil {
 			if err := os.Rename(dest, destBackup); os.IsPermission(err) {
-				return fmt.Errorf("permission denied, see https://git.smith.care/smith/uc-phep/polar/polar-control-2#permission-denied")
+				return fmt.Errorf("permission denied, see https://git.smith.care/smith/uc-phep/dup-control#permission-denied")
 			} else if err != nil {
 				return err
 			}

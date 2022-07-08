@@ -63,7 +63,7 @@ func (c *analyzeCommand) Command() *cobra.Command {
 	command := &cobra.Command{
 		Use:   "analyze",
 		Short: "Analyze bundles retrieved from FHIR server",
-		Long:  "You can analyze bundles that have formerly been retrieved from the FHIR server for a specific POLAR workpackage",
+		Long:  "You can analyze bundles that have formerly been retrieved from the FHIR server for a specific dup",
 		PreRun: func(cmd *cobra.Command, args []string) {
 			c.analyzeOpts.version = viper.GetString("analyze.version")
 			c.analyzeOpts.env = viper.GetStringMapString("analyze.env")
