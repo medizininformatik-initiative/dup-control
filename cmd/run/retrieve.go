@@ -44,7 +44,7 @@ func (c *retrieveCommand) createRetrieveOpts(retrieveOpts retrieveOpts) (contain
 	}
 	runOpts := container.RunOpts{
 		Env: append(coll.JoinEntries(retrieveOpts.env, "="),
-			fmt.Sprintf("FHIR_ENDPOINT=%s", retrieveOpts.fhirServerEndpoint)),
+			fmt.Sprintf("FHIR_SERVER_ENDPOINT=%s", retrieveOpts.fhirServerEndpoint)),
 		Mounts: []docker.HostMount{
 			container.LocalMount("outputLocal", true),
 			container.LocalMount("outputGlobal", true),
@@ -56,8 +56,8 @@ func (c *retrieveCommand) createRetrieveOpts(retrieveOpts retrieveOpts) (contain
 	}
 	if retrieveOpts.fhirServerUser != "" && retrieveOpts.fhirServerPass != "" {
 		runOpts.Env = append(runOpts.Env,
-			fmt.Sprintf("FHIR_USERNAME=%s", retrieveOpts.fhirServerUser),
-			fmt.Sprintf("FHIR_PASSWORD=%s", retrieveOpts.fhirServerPass))
+			fmt.Sprintf("FHIR_SERVER_USER=%s", retrieveOpts.fhirServerUser),
+			fmt.Sprintf("FHIR_SERVER_PASS=%s", retrieveOpts.fhirServerPass))
 	}
 	if retrieveOpts.fhirServerCACert != "" {
 		if abs, err := filepath.Abs(retrieveOpts.fhirServerCACert); err == nil {
@@ -73,7 +73,7 @@ func (c *retrieveCommand) createRetrieveOpts(retrieveOpts retrieveOpts) (contain
 	}
 	if retrieveOpts.fhirServerToken != "" {
 		runOpts.Env = append(runOpts.Env,
-			fmt.Sprintf("FHIR_TOKEN=%s", retrieveOpts.fhirServerToken))
+			fmt.Sprintf("FHIR_SERVER_TOKEN=%s", retrieveOpts.fhirServerToken))
 	}
 	if retrieveOpts.dev {
 		pullOpts.Image = "base"
