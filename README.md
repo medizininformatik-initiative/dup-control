@@ -1,7 +1,7 @@
-# Polar Control
+# DUP Control
 
-Utility to manage [POLAR][polar] workpackage and -pilot algorithm
-execution using docker.
+Execution helper for various Data Usage Projects (DUP) that are implemented as run-once container images and (may be) 
+split into retrieval and analysis parts.
 
 ## Installation
 
@@ -10,12 +10,8 @@ execution using docker.
 #### Docker
 
 * Docker must be installed on the system. Please follow the [official installation instructions][docker-install].
-* Also consider allowing your non-root Linux user to use docker (and polarctl) by adding it to the docker group 
-(see [docker docs][docker-ugroup]) otherwise only a root user will be able to execute polarctl. 
-
-#### Uninstall polarctl v1
-
-Uninstall the old version of polarctl (if installed) using the provided `uninstall.sh`/`uninstall.ps1` (see [polarctl v1][polarctl-v1]).
+* Also consider allowing your non-root Linux user to use docker (and dupctl) by adding it to the docker group 
+(see [docker docs][docker-ugroup]) otherwise only a root user will be able to execute dupctl. 
 
 ### Download the Latest Version
 
@@ -27,28 +23,28 @@ Uninstall the old version of polarctl (if installed) using the provided `uninsta
 
 ### Windows
 
-Move the downloaded `polarctl.exe` into a directory in your [PATH][wiki-path] (`echo $env:PATH` (PowerShell)). 
+Move the downloaded `dupctl.exe` into a directory in your [PATH][wiki-path] (`echo $env:PATH` (PowerShell)). 
 
-* using `C:\Windows\System32\` will enable polarctl for all users. *Note: Access to C:\Windows\System32\ may require administrator access privileges.*
-* using `C:\Users\%USERNAME%\AppData\Local\Microsoft\WindowsApps` will enable polarctl for the current user. *Note: Make sure the directory is in your [PATH][wiki-path] (see `echo $env:PATH` (PowerShell))!*
+* using `C:\Windows\System32\` will enable dupctl for all users. *Note: Access to C:\Windows\System32\ may require administrator access privileges.*
+* using `C:\Users\%USERNAME%\AppData\Local\Microsoft\WindowsApps` will enable dupctl for the current user. *Note: Make sure the directory is in your [PATH][wiki-path] (see `echo $env:PATH` (PowerShell))!*
 
-polarctl can then be executed via cmd or powershell. 
+dupctl can then be executed via cmd or powershell. 
 
 **Download using Command Line (Windows)**
 
 You can also download the executable using a command line:
 
 ```shell
-curl https://polarctl.s3.amazonaws.com/polarctl-windows-amd64.exe -O polarctl.exe
+curl https://dupctl.s3.amazonaws.com/dupctl-windows-amd64.exe -O dupctl.exe
 ```
 
 ### Linux / macOS
 
-Move the downloaded `polarctl` binary into a directory in your [PATH][wiki-path] (`echo $PATH`).
+Move the downloaded `dupctl` binary into a directory in your [PATH][wiki-path] (`echo $PATH`).
 
 ```shell
-sudo mv polarctl /usr/local/bin/polarctl
-sudo chmod +x /usr/local/bin/polarctl
+sudo mv dupctl /usr/local/bin/dupctl
+sudo chmod +x /usr/local/bin/dupctl
 ```
 
 **Download using Command Line (Linux/macOS)**
@@ -56,26 +52,30 @@ sudo chmod +x /usr/local/bin/polarctl
 You can also download the executable using a command line, fill in the appropriate link from the [download table](#download-the-latest-version).
 
 ```shell
-curl [link] -O polarctl
+curl [link] -O dupctl
 ```
 
 ## Usage
 
 ### Working Directory
 
-Choose a working directory from where you will execute polarctl commands. This is very important, as polarctl uses the current 
-working directory (cwd) to store results from the executed workpackages and to find the polarctl config.  
+Choose a working directory from where you will execute dupctl commands. This is very important, as dupctl uses the current 
+working directory (cwd) to store results from the executed workpackages and to find the dupctl config.  
 
-### Create polarctl Config
+### Create dupctl Config
 
-Create a file called `config.toml` within your chosen polar working directory. The minimal configuration contains the polar 
-container registry credentials (formerly used with `docker login` command) in the following form:
+Create a file called `config.toml` within your chosen working directory. The minimal configuration contains the projects 
+container registry, the registry credentials (formerly used with `docker login` command) and a project name in the following form:
 ```toml
-registryUser = "polar-dic-<site>"
+project = "some-project"
+registry = "example.com/container-registry"
+registryUser = "<username>"
 registryPass = "<password>"
 ```
 
-*Note: POLAR Container Registry Credentials are provided per DIC by the UC PheP Development Team. Please contact
+*Note: The project name will distinguish docker containers belonging to different projects.*
+
+*Note: Container Registry Credentials are provided per DIC by the UC PheP Development Team. Please contact
 [Jonas Wagner](mailto:jwagner@life.uni-leipzig.de) or [Frank Meineke](mailto:Frank.Meineke@imise.uni-leipzig.de).*
 
 ### Global Settings
@@ -92,7 +92,7 @@ the config file. *CLI opts will override config settings.*
 ### Retrieval
 
 ```shell
-polarctl retrieve --wp <workpackage> --fhir-server-endpoint "https://some-fhir-server" [flags] 
+dupctl retrieve --wp <workpackage> --fhir-server-endpoint "https://some-fhir-server" [flags] 
 ```
 
 #### Settings
@@ -103,26 +103,24 @@ the config file. *CLI opts will override config settings.*
 | CLI Flag               | Config Key                  | Description                                                                                                                                                                               | Optional? | Default |
 |------------------------|-----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|---------|
 | --wp                   |                             | Workpackage algorithm to execute, e.g. 'wp-1-1-pilot'                                                                                                                                     | No        |         | 
-| --site                 | retrieve.site               | Determines which image to use, as images can be versioned or hand-tailored for different dic sites. (e.g. 'dic-giessen', 'dic-leipzig', 'dic-muenchen'). DEPRECATED! Use version instead! | Yes       | latest  |
 | --version              | retrieve.version            | Determines which image to use, as images can be versioned or hand-tailored for different dic sites. (e.g. '0.1', dic-giessen', 'dic-leipzig', 'dic-muenchen').                            | Yes       | latest  |
 | --fhir-server-endpoint | retrieve.fhirServerEndpoint | URL including base path of the FHIR Server to be queried, e.g.: 'https://example.com/r4/'                                                                                                 | No        |         |
 | --fhir-server-user     | retrieve.fhirServerUser     | Username for basic auth protected communication with FHIR Server                                                                                                                          | Yes       |         |
 | --fhir-server-pass     | retrieve.fhirServerPass     | Password for basic auth protected communication with FHIR Server                                                                                                                          | Yes       |         |
 | --fhir-server-cacert   | retrieve.fhirServerCACert   | CA Certificate file[^cafile] for https connection to FHIR Server                                                                                                                          | Yes       |         |
 | --fhir-server-token    | retrieve.fhirServerToken    | Token for token based auth protected communication with FHIR Server                                                                                                                       | Yes       |         |
-| --dev                  |                             | Enables settings for local development                                                                                                                                                    | Yes       | false   |
 | --env / -e             | retrieve.env                | Passes environment variables to the workpackage scripts, e.g.: -e "MAX_BUNDLES=5"                                                                                                         | Yes       |         |
 
 #### Example
 
 ```shell
-polarctl retrieve --wp wp-1-1-pilot --fhir-server-endpoint "https://mii-agiop-3p.life.uni-leipzig.de/fhir/"
+dupctl retrieve --wp wp-1-1-pilot --fhir-server-endpoint "https://mii-agiop-3p.life.uni-leipzig.de/fhir/"
 ```
 
 ### Analysis
 
 ```shell
-polarctl analyze --wp <workpackage> [flags] 
+dupctl analyze --wp <workpackage> [flags] 
 ```
 
 #### Settings
@@ -134,19 +132,18 @@ the config file. *CLI opts will override config settings.*
 |------------|-----------------|-----------------------------------------------------------------------------------|-----------|---------|
 | --wp       |                 | Workpackage algorithm to execute, e.g. 'wp-1-1-pilot'                             | No        |         | 
 | --version  | analyze.version | Determines which version of the analysis algorithm to use                         | Yes       | latest  |
-| --dev      |                 | Enables settings for local development                                            | Yes       | false   |
 | --env / -e | analyze.env     | Passes environment variables to the workpackage scripts, e.g.: -e "MAX_BUNDLES=5" | Yes       |         |
 
 #### Example
 
 ```shell
-polarctl analyze --wp wp-1-1-pilot --version "1.0"
+dupctl analyze --wp wp-1-1-pilot --version "1.0"
 ```
 
 ### Example Configuration
 
 ```toml
-registryUser = "polar-some-dic"
+registryUser = "some-dic"
 registryPass = "some-individual-password"
 
 [retrieve]
@@ -160,20 +157,18 @@ env = {"MAX_BUNDLES" = "100", "COUNT" = 200}
 
 ### Permission denied
 
-Getting a `permission denied` error when using `polarctl upgrade` usually means you require access rights on the 
-currently installed polarctl file. On linux using `sudo polarctl upgrade` should suffice.
+Getting a `permission denied` error when using `dupctl upgrade` usually means you require access rights on the 
+currently installed dupctl file. On linux using `sudo dupctl upgrade` should suffice.
 
-[polar]: https://www.medizininformatik-initiative.de/de/POLAR
 [docker-install]: https://docs.docker.com/get-docker/
 [docker-ugroup]: https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user
-[polarctl-v1]: https://git.smith.care/smith/uc-phep/polar/polar-control
 
 [wiki-amd64]: https://en.wikipedia.org/wiki/X86-64#AMD64
 [wiki-arm64]: https://de.wikipedia.org/wiki/Arm-Architektur#Armv8-A_(2011)
 [wiki-path]: https://en.wikipedia.org/wiki/PATH_(variable)
 
-[windows-amd64]: https://polarctl.s3.amazonaws.com/polarctl-windows-amd64.exe
-[linux-amd64]: https://polarctl.s3.amazonaws.com/polarctl-linux-amd64
-[linux-arm64]: https://polarctl.s3.amazonaws.com/polarctl-linux-arm64
-[darwin-amd64]: https://polarctl.s3.amazonaws.com/polarctl-darwin-amd64
-[darwin-arm64]: https://polarctl.s3.amazonaws.com/polarctl-darwin-arm64
+[windows-amd64]: https://dupctl.s3.amazonaws.com/dupctl-windows-amd64.exe
+[linux-amd64]: https://dupctl.s3.amazonaws.com/dupctl-linux-amd64
+[linux-arm64]: https://dupctl.s3.amazonaws.com/dupctl-linux-arm64
+[darwin-amd64]: https://dupctl.s3.amazonaws.com/dupctl-darwin-amd64
+[darwin-arm64]: https://dupctl.s3.amazonaws.com/dupctl-darwin-arm64

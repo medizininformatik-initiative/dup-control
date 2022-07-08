@@ -2,8 +2,8 @@ package util
 
 import (
 	"fmt"
-	. "git.smith.care/smith/uc-phep/polar/polarctl/lib/cli"
-	"git.smith.care/smith/uc-phep/polar/polarctl/lib/upgrade"
+	. "git.smith.care/smith/uc-phep/dupctl/lib/cli"
+	"git.smith.care/smith/uc-phep/dupctl/lib/upgrade"
 	"github.com/op/go-logging"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -21,13 +21,13 @@ func NewUpgradeCommand(log *logging.Logger, updater upgrade.Updater) *upgradeCom
 func (c *upgradeCommand) Command() *cobra.Command {
 	return &cobra.Command{
 		Use:              "upgrade",
-		Short:            "Upgrade polarctl",
-		Long:             "You can upgrade your polarctl installation with the most recent version",
+		Short:            "Upgrade dupctl",
+		Long:             "You can upgrade your dupctl installation with the most recent version",
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if !viper.GetBool("offline") {
 				if err := c.updater.Upgrade(); err != nil {
-					return ExecutionError(cmd, "error updating polarctl: %w", err)
+					return ExecutionError(cmd, "error updating dupctl: %w", err)
 				}
 			} else {
 				return fmt.Errorf("cannot upgrade in --offline mode")

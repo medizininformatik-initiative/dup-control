@@ -1,4 +1,4 @@
-module git.smith.care/smith/uc-phep/polar/polarctl
+module git.smith.care/smith/uc-phep/dupctl
 
 go 1.17
 

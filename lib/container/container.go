@@ -23,27 +23,31 @@ type DockerClient interface {
 type Runtime struct {
 	context    context.Context
 	client     DockerClient
+	registry   string
+	namespace  string
 	authConfig docker.AuthConfiguration
 }
 
-func NewRuntime(client DockerClient, registryUser string, registryPass string) *Runtime {
+func NewRuntime(client DockerClient, registry string, namespace string, registryUser string, registryPass string) *Runtime {
 	return &Runtime{
 		context:    context.Background(),
 		client:     client,
+		registry:   registry,
+		namespace:  namespace,
 		authConfig: docker.AuthConfiguration{Username: registryUser, Password: registryPass},
 	}
 }
 
-func sprintRepositoryName(workpackage string) string {
-	return fmt.Sprintf("registry.gitlab.com/smith-phep/polar/%s", workpackage)
+func (runtime *Runtime) sprintRepositoryName(workpackage string) string {
+	return fmt.Sprintf("%s/%s", runtime.registry, workpackage)
 }
 
-func sprintImageName(workpackage string, site string) string {
-	return fmt.Sprintf("%s:%s", sprintRepositoryName(workpackage), site)
+func (runtime *Runtime) sprintImageName(workpackage string, site string) string {
+	return fmt.Sprintf("%s:%s", runtime.sprintRepositoryName(workpackage), site)
 }
 
-func sprintContainerName(prefix string, workpackage string, site string) string {
-	return fmt.Sprintf("polar-%s-%s-%s", prefix, workpackage, site)
+func (runtime *Runtime) sprintContainerName(prefix string, workpackage string, site string) string {
+	return fmt.Sprintf("%s-%s-%s-%s", runtime.namespace, prefix, workpackage, site)
 }
 
 type PullOpts struct {
@@ -52,7 +56,7 @@ type PullOpts struct {
 }
 
 func (runtime *Runtime) Pull(pullOpts PullOpts) error {
-	imageName := sprintRepositoryName(pullOpts.Image)
+	imageName := runtime.sprintRepositoryName(pullOpts.Image)
 	opts := docker.PullImageOptions{
 		Context:      runtime.context,
 		Repository:   imageName,
@@ -72,11 +76,11 @@ type RunOpts struct {
 	Mounts []docker.HostMount
 }
 
-func containerConfigFromOpts(pullOpts PullOpts, runOpts RunOpts) *docker.Config {
+func (runtime *Runtime) containerConfigFromOpts(pullOpts PullOpts, runOpts RunOpts) *docker.Config {
 	return &docker.Config{
 		User:  runOpts.User,
 		Env:   runOpts.Env,
-		Image: sprintImageName(pullOpts.Image, pullOpts.Tag),
+		Image: runtime.sprintImageName(pullOpts.Image, pullOpts.Tag),
 	}
 }
 
@@ -88,11 +92,11 @@ func containerHostConfigFromOpts(opts RunOpts) *docker.HostConfig {
 }
 
 func (runtime *Runtime) Run(containerNamePrefix string, pullOpts PullOpts, runOpts RunOpts) error {
-	containerName := sprintContainerName(containerNamePrefix, pullOpts.Image, pullOpts.Tag)
+	containerName := runtime.sprintContainerName(containerNamePrefix, pullOpts.Image, pullOpts.Tag)
 	containerOpts := docker.CreateContainerOptions{
 		Context:    runtime.context,
 		Name:       containerName,
-		Config:     containerConfigFromOpts(pullOpts, runOpts),
+		Config:     runtime.containerConfigFromOpts(pullOpts, runOpts),
 		HostConfig: containerHostConfigFromOpts(runOpts),
 	}
 	container, err := runtime.client.CreateContainer(containerOpts)
@@ -147,7 +151,7 @@ func LocalMount(dirName string, rw bool) docker.HostMount {
 	}
 	return docker.HostMount{
 		Source:   dir,
-		Target:   fmt.Sprintf("/polar/%s", dirName),
+		Target:   fmt.Sprintf("/mnt/%s", dirName),
 		Type:     "bind",
 		ReadOnly: !rw,
 	}

@@ -50,6 +50,8 @@ func (mock *mockClient) Logs(opts docker.LogsOptions) error {
 	return args.Error(0)
 }
 
+const registry = "registry.gitlab.com/some-registry"
+const namespace = "test"
 const pass = "some-pass"
 const user = "some-user"
 const dic = "dic-anywhere"
@@ -57,9 +59,9 @@ const id = "102583"
 
 func TestPull(t *testing.T) {
 	dockerMock := new(mockClient)
-	runtime := NewRuntime(dockerMock, user, pass)
+	runtime := NewRuntime(dockerMock, registry, namespace, user, pass)
 	dockerMock.On("PullImage",
-		mockPullOpts{Repository: "registry.gitlab.com/smith-phep/polar/wp-0", Tag: dic},
+		mockPullOpts{Repository: "registry.gitlab.com/some-registry/wp-0", Tag: dic},
 		docker.AuthConfiguration{Username: user, Password: pass}).Return(nil)
 
 	_ = runtime.Pull(PullOpts{Image: "wp-0", Tag: dic})
@@ -69,7 +71,7 @@ func TestPull(t *testing.T) {
 
 func TestPullError(t *testing.T) {
 	dockerMock := new(mockClient)
-	runtime := NewRuntime(dockerMock, user, pass)
+	runtime := NewRuntime(dockerMock, registry, namespace, user, pass)
 	dockerMock.On("PullImage", mock.Anything, mock.Anything).Return(errors.New("unable to pull image"))
 
 	err := runtime.Pull(PullOpts{Image: "wp-6", Tag: dic})
@@ -80,7 +82,7 @@ func TestPullError(t *testing.T) {
 
 func TestRun(t *testing.T) {
 	dockerMock := new(mockClient)
-	runtime := NewRuntime(dockerMock, user, pass)
+	runtime := NewRuntime(dockerMock, registry, namespace, user, pass)
 
 	dockerMock.On("CreateContainer",
 		mock.Anything).Return(&docker.Container{ID: id}, nil)
@@ -100,7 +102,7 @@ func TestRun(t *testing.T) {
 
 func TestRunWithCreateError(t *testing.T) {
 	dockerMock := new(mockClient)
-	runtime := NewRuntime(dockerMock, user, pass)
+	runtime := NewRuntime(dockerMock, registry, namespace, user, pass)
 
 	dockerMock.On("CreateContainer",
 		mock.Anything).Return(&docker.Container{}, errors.New("unable to create container"))
@@ -116,7 +118,7 @@ func TestRunWithCreateError(t *testing.T) {
 
 func TestRunWithStartError(t *testing.T) {
 	dockerMock := new(mockClient)
-	runtime := NewRuntime(dockerMock, user, pass)
+	runtime := NewRuntime(dockerMock, registry, namespace, user, pass)
 
 	dockerMock.On("CreateContainer",
 		mock.Anything).Return(&docker.Container{ID: id}, nil)
@@ -136,7 +138,7 @@ func TestRunWithStartError(t *testing.T) {
 
 func TestRunWithLogError(t *testing.T) {
 	dockerMock := new(mockClient)
-	runtime := NewRuntime(dockerMock, user, pass)
+	runtime := NewRuntime(dockerMock, registry, namespace, user, pass)
 
 	dockerMock.On("CreateContainer",
 		mock.Anything).Return(&docker.Container{ID: id}, nil)

@@ -2,11 +2,11 @@ package cmd
 
 import (
 	"fmt"
-	"git.smith.care/smith/uc-phep/polar/polarctl/cmd/run"
-	"git.smith.care/smith/uc-phep/polar/polarctl/cmd/util"
-	. "git.smith.care/smith/uc-phep/polar/polarctl/lib/cli"
-	"git.smith.care/smith/uc-phep/polar/polarctl/lib/container"
-	"git.smith.care/smith/uc-phep/polar/polarctl/lib/upgrade"
+	"git.smith.care/smith/uc-phep/dupctl/cmd/run"
+	"git.smith.care/smith/uc-phep/dupctl/cmd/util"
+	. "git.smith.care/smith/uc-phep/dupctl/lib/cli"
+	"git.smith.care/smith/uc-phep/dupctl/lib/container"
+	"git.smith.care/smith/uc-phep/dupctl/lib/upgrade"
 	docker "github.com/fsouza/go-dockerclient"
 	"github.com/op/go-logging"
 	"github.com/spf13/cobra"
@@ -28,7 +28,7 @@ func NewRootCmd() *rootCmd {
 	return &rootCmd{
 		log:            logging.MustGetLogger("cmd"),
 		version:        Version,
-		updaterBaseUrl: "https://polarctl.s3.amazonaws.com",
+		updaterBaseUrl: "https://dupctl.s3.amazonaws.com",
 	}
 }
 
@@ -36,9 +36,9 @@ func (c *rootCmd) Command() *cobra.Command {
 	updater := c.initUpdater()
 
 	command := &cobra.Command{
-		Use:   "polarctl",
-		Short: "Control POLAR",
-		Long:  `polarctl....`,
+		Use:   "dupctl",
+		Short: "Execute Data Use Project containers",
+		Long:  `dupctl....`,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			if err := c.initConfig(); err != nil {
 				return ExecutionError(cmd, "error initializing config, %w", err)
@@ -77,7 +77,7 @@ func (c *rootCmd) initConfig() error {
 func (c *rootCmd) initUpdater() upgrade.Updater {
 	updater, err := upgrade.NewUpdater(c.updaterBaseUrl, runtime.GOOS, runtime.GOARCH, "VERSION", c.version)
 	if err != nil {
-		log.Fatalf("Error creating polarctl updater: %v", err)
+		log.Fatalf("Error creating dupctl updater: %v", err)
 	}
 	return updater
 }
@@ -86,10 +86,10 @@ func (c *rootCmd) checkForUpdates(updater upgrade.Updater) {
 	if !viper.GetBool("disableUpdateCheck") && !viper.GetBool("offline") {
 		available, remoteVersion := updater.IsNewerVersionAvailable()
 		if available {
-			c.log.Infof("polarctl version %s available, use `polarctl upgrade` to download and replace your current version", remoteVersion)
+			c.log.Infof("dupctl version %s available, use `dupctl upgrade` to download and replace your current version", remoteVersion)
 		}
 	} else {
-		c.log.Debugf("Upgrade checks disabled")
+		c.log.Debugf("dupctl checks disabled")
 	}
 }
 
@@ -104,6 +104,7 @@ func (p *containerRuntimeProvider) CreateRuntime() (*container.Runtime, error) {
 	} else if cli, err := docker.NewClientFromEnv(); err != nil {
 		return nil, fmt.Errorf("cannot instantiate docker client, %w", err)
 	} else {
-		return container.NewRuntime(cli, viper.GetString("registryUser"), viper.GetString("registryPass")), nil
+		return container.NewRuntime(cli, viper.GetString("registry"), viper.GetString("project"),
+			viper.GetString("registryUser"), viper.GetString("registryPass")), nil
 	}
 }

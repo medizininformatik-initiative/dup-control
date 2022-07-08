@@ -39,5 +39,5 @@ func TestUpgradeFails(t *testing.T) {
 	command.SetOut(bytes.NewBufferString(""))
 	err := command.Execute()
 
-	assert.Error(t, err, "Error updating polarctl: some error")
+	assert.Error(t, err, "Error updating dupctl: some error")
 }

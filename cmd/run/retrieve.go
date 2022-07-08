@@ -2,9 +2,9 @@ package run
 
 import (
 	"fmt"
-	. "git.smith.care/smith/uc-phep/polar/polarctl/lib/cli"
-	"git.smith.care/smith/uc-phep/polar/polarctl/lib/coll"
-	"git.smith.care/smith/uc-phep/polar/polarctl/lib/container"
+	. "git.smith.care/smith/uc-phep/dupctl/lib/cli"
+	"git.smith.care/smith/uc-phep/dupctl/lib/coll"
+	"git.smith.care/smith/uc-phep/dupctl/lib/container"
 	docker "github.com/fsouza/go-dockerclient"
 	"github.com/op/go-logging"
 	"github.com/spf13/cobra"
@@ -44,7 +44,7 @@ func (c *retrieveCommand) createRetrieveOpts(retrieveOpts retrieveOpts) (contain
 	}
 	runOpts := container.RunOpts{
 		Env: append(coll.JoinEntries(retrieveOpts.env, "="),
-			fmt.Sprintf("FHIR_ENDPOINT=%s", retrieveOpts.fhirServerEndpoint)),
+			fmt.Sprintf("FHIR_SERVER_ENDPOINT=%s", retrieveOpts.fhirServerEndpoint)),
 		Mounts: []docker.HostMount{
 			container.LocalMount("outputLocal", true),
 			container.LocalMount("outputGlobal", true),
@@ -56,8 +56,8 @@ func (c *retrieveCommand) createRetrieveOpts(retrieveOpts retrieveOpts) (contain
 	}
 	if retrieveOpts.fhirServerUser != "" && retrieveOpts.fhirServerPass != "" {
 		runOpts.Env = append(runOpts.Env,
-			fmt.Sprintf("FHIR_USERNAME=%s", retrieveOpts.fhirServerUser),
-			fmt.Sprintf("FHIR_PASSWORD=%s", retrieveOpts.fhirServerPass))
+			fmt.Sprintf("FHIR_SERVER_USER=%s", retrieveOpts.fhirServerUser),
+			fmt.Sprintf("FHIR_SERVER_PASS=%s", retrieveOpts.fhirServerPass))
 	}
 	if retrieveOpts.fhirServerCACert != "" {
 		if abs, err := filepath.Abs(retrieveOpts.fhirServerCACert); err == nil {
@@ -72,17 +72,8 @@ func (c *retrieveCommand) createRetrieveOpts(retrieveOpts retrieveOpts) (contain
 		}
 	}
 	if retrieveOpts.fhirServerToken != "" {
-			runOpts.Env = append(runOpts.Env,
-				fmt.Sprintf("FHIR_TOKEN=%s", retrieveOpts.fhirServerToken))
-		}
-		if retrieveOpts.dev {
-		pullOpts.Image = "base"
-		pullOpts.Tag = "latest"
-		runOpts.Mounts = append(runOpts.Mounts,
-			container.LocalMount("main.R", true),
-			container.LocalMount("scripts", true),
-			container.LocalMount("assets", true),
-		)
+		runOpts.Env = append(runOpts.Env,
+			fmt.Sprintf("FHIR_SERVER_TOKEN=%s", retrieveOpts.fhirServerToken))
 	}
 	return pullOpts, runOpts
 }
@@ -91,19 +82,14 @@ func (c *retrieveCommand) Command() *cobra.Command {
 	command := &cobra.Command{
 		Use:   "retrieve",
 		Short: "Retrieve bundles from FHIR server",
-		Long:  "You can retrieve bundles from the FHIR server for a specific POLAR workpackage",
+		Long:  "You can retrieve bundles from the FHIR server for a specific dup",
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			if viper.GetString("retrieve.fhirServerEndpoint") == "" {
 				return fmt.Errorf("retrieve.fhirServerEndpoint not set")
 			} else {
 				c.retrieveOpts.fhirServerEndpoint = viper.GetString("retrieve.fhirServerEndpoint")
 			}
-			if site := viper.GetString("retrieve.site"); site != "latest" {
-				c.log.Warningf("--site flag / retrieve.site option is deprecated! Use --version flag / retrieve.version option instead!")
-				c.retrieveOpts.version = site
-			} else {
-				c.retrieveOpts.version = viper.GetString("retrieve.version")
-			}
+			c.retrieveOpts.version = viper.GetString("retrieve.version")
 			c.retrieveOpts.fhirServerUser = viper.GetString("retrieve.fhirServerUser")
 			c.retrieveOpts.fhirServerPass = viper.GetString("retrieve.fhirServerPass")
 			c.retrieveOpts.fhirServerCACert = viper.GetString("retrieve.fhirServerCACert")
@@ -139,8 +125,6 @@ func (c *retrieveCommand) Command() *cobra.Command {
 
 	command.PersistentFlags().String("version", "latest", "Determines which image to use, as images can be versioned or hand-tailored for different dic sites. (e.g. '0.1', 'dic-giessen', 'dic-leipzig', 'dic-muenchen').")
 	_ = viper.BindPFlag("retrieve.version", command.PersistentFlags().Lookup("version"))
-	command.PersistentFlags().String("site", "latest", "Determines which image to use, as images can be hand-tailored for different dic sites. (e.g. 'dic-giessen', 'dic-leipzig', 'dic-muenchen'). DEPRECATED! Use --version instead!")
-	_ = viper.BindPFlag("retrieve.site", command.PersistentFlags().Lookup("site"))
 
 	command.PersistentFlags().String("fhir-server-endpoint", "", "the base URL of the FHIR server to use")
 	_ = viper.BindPFlag("retrieve.fhirServerEndpoint", command.PersistentFlags().Lookup("fhir-server-endpoint"))
@@ -153,8 +137,6 @@ func (c *retrieveCommand) Command() *cobra.Command {
 
 	command.PersistentFlags().String("fhir-server-token", "", "Token for token based auth protected communication with FHIR Server")
 	_ = viper.BindPFlag("retrieve.fhirServerToken", command.PersistentFlags().Lookup("fhir-server-token"))
-
-	command.PersistentFlags().BoolVar(&c.retrieveOpts.dev, "dev", false, "Mounts main.R, scripts/ and assets/ from current working directory for local development.")
 
 	command.PersistentFlags().StringToStringP("env", "e", map[string]string{}, "Accepts key-value pairs in the form of key=value and passes them unchanged to the running scripts")
 	_ = viper.BindPFlag("retrieve.env", command.PersistentFlags().Lookup("env"))

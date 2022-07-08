@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"git.smith.care/smith/uc-phep/polar/polarctl/cmd"
+	"git.smith.care/smith/uc-phep/dupctl/cmd"
 	"os"
 )
 
