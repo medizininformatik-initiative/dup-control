@@ -28,9 +28,9 @@ type DefaultUpdater struct {
 
 func SprintReleaseKey(os string, arch string) string {
 	if os != "windows" {
-		return fmt.Sprintf("polarctl-%s-%s", os, arch)
+		return fmt.Sprintf("dupctl-%s-%s", os, arch)
 	} else {
-		return fmt.Sprintf("polarctl-%s-%s.exe", os, arch)
+		return fmt.Sprintf("dupctl-%s-%s.exe", os, arch)
 	}
 }
 
@@ -67,20 +67,20 @@ func NewUpdater(baseUrl string, os string, arch string, versionPath string, curr
 func (updater *DefaultUpdater) IsNewerVersionAvailable() (bool, string) {
 	resp, err := http.Get(updater.BaseURL.ResolveReference(updater.VersionPath).String())
 	if err != nil {
-		log.Errorf("Error searching for new version of polarctl", err)
+		log.Errorf("Error searching for new version of dupctl", err)
 		return false, ""
 	}
 	defer resp.Body.Close()
 
 	versionBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Errorf("Error reading new version of polarctl", err)
+		log.Errorf("Error reading new version of dupctl", err)
 		return false, ""
 	}
 
 	remoteVersion := strings.TrimSpace(string(versionBytes))
 	if err != nil || !semver.IsValid(remoteVersion) {
-		log.Errorf("New version of polarctl was invalid, '%s'", remoteVersion)
+		log.Errorf("New version of dupctl was invalid, '%s'", remoteVersion)
 		return false, ""
 	}
 	return semver.Compare(updater.CurrentVersion, remoteVersion) < 0, remoteVersion

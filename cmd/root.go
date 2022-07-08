@@ -28,7 +28,7 @@ func NewRootCmd() *rootCmd {
 	return &rootCmd{
 		log:            logging.MustGetLogger("cmd"),
 		version:        Version,
-		updaterBaseUrl: "https://polarctl.s3.amazonaws.com",
+		updaterBaseUrl: "https://dupctl.s3.amazonaws.com",
 	}
 }
 
@@ -36,9 +36,9 @@ func (c *rootCmd) Command() *cobra.Command {
 	updater := c.initUpdater()
 
 	command := &cobra.Command{
-		Use:   "polarctl",
+		Use:   "dupctl",
 		Short: "Control POLAR",
-		Long:  `polarctl....`,
+		Long:  `dupctl....`,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			if err := c.initConfig(); err != nil {
 				return ExecutionError(cmd, "error initializing config, %w", err)
@@ -77,7 +77,7 @@ func (c *rootCmd) initConfig() error {
 func (c *rootCmd) initUpdater() upgrade.Updater {
 	updater, err := upgrade.NewUpdater(c.updaterBaseUrl, runtime.GOOS, runtime.GOARCH, "VERSION", c.version)
 	if err != nil {
-		log.Fatalf("Error creating polarctl updater: %v", err)
+		log.Fatalf("Error creating dupctl updater: %v", err)
 	}
 	return updater
 }
@@ -86,10 +86,10 @@ func (c *rootCmd) checkForUpdates(updater upgrade.Updater) {
 	if !viper.GetBool("disableUpdateCheck") && !viper.GetBool("offline") {
 		available, remoteVersion := updater.IsNewerVersionAvailable()
 		if available {
-			c.log.Infof("polarctl version %s available, use `polarctl upgrade` to download and replace your current version", remoteVersion)
+			c.log.Infof("dupctl version %s available, use `dupctl upgrade` to download and replace your current version", remoteVersion)
 		}
 	} else {
-		c.log.Debugf("Upgrade checks disabled")
+		c.log.Debugf("dupctl checks disabled")
 	}
 }
 
