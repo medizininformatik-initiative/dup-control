@@ -47,15 +47,6 @@ func (c *analyzeCommand) createAnalyseOpts(analyzeOpts analyzeOpts) (container.P
 		runOpts.User = fmt.Sprintf("%d:%d", os.Getuid(), os.Getgid())
 		runOpts.Env = append(runOpts.Env, "TERM=xterm-256color")
 	}
-	if analyzeOpts.dev {
-		pullOpts.Image = "base"
-		pullOpts.Tag = "latest"
-		runOpts.Mounts = append(runOpts.Mounts,
-			container.LocalMount("main.R", true),
-			container.LocalMount("scripts", true),
-			container.LocalMount("assets", true),
-		)
-	}
 	return pullOpts, runOpts
 }
 
@@ -96,8 +87,6 @@ func (c *analyzeCommand) Command() *cobra.Command {
 
 	command.PersistentFlags().String("version", "latest", "Determines which image version to use.")
 	_ = viper.BindPFlag("analyze.version", command.PersistentFlags().Lookup("version"))
-
-	command.PersistentFlags().BoolVar(&c.analyzeOpts.dev, "dev", false, "Mounts main.R, scripts/ and assets/ from current working directory for local development.")
 
 	command.PersistentFlags().StringToStringP("env", "e", map[string]string{}, "Accepts key-value pairs in the form of key=value and passes them unchanged to the running scripts")
 	_ = viper.BindPFlag("analyze.env", command.PersistentFlags().Lookup("env"))

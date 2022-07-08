@@ -103,14 +103,12 @@ the config file. *CLI opts will override config settings.*
 | CLI Flag               | Config Key                  | Description                                                                                                                                                                               | Optional? | Default |
 |------------------------|-----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|---------|
 | --wp                   |                             | Workpackage algorithm to execute, e.g. 'wp-1-1-pilot'                                                                                                                                     | No        |         | 
-| --site                 | retrieve.site               | Determines which image to use, as images can be versioned or hand-tailored for different dic sites. (e.g. 'dic-giessen', 'dic-leipzig', 'dic-muenchen'). DEPRECATED! Use version instead! | Yes       | latest  |
 | --version              | retrieve.version            | Determines which image to use, as images can be versioned or hand-tailored for different dic sites. (e.g. '0.1', dic-giessen', 'dic-leipzig', 'dic-muenchen').                            | Yes       | latest  |
 | --fhir-server-endpoint | retrieve.fhirServerEndpoint | URL including base path of the FHIR Server to be queried, e.g.: 'https://example.com/r4/'                                                                                                 | No        |         |
 | --fhir-server-user     | retrieve.fhirServerUser     | Username for basic auth protected communication with FHIR Server                                                                                                                          | Yes       |         |
 | --fhir-server-pass     | retrieve.fhirServerPass     | Password for basic auth protected communication with FHIR Server                                                                                                                          | Yes       |         |
 | --fhir-server-cacert   | retrieve.fhirServerCACert   | CA Certificate file[^cafile] for https connection to FHIR Server                                                                                                                          | Yes       |         |
 | --fhir-server-token    | retrieve.fhirServerToken    | Token for token based auth protected communication with FHIR Server                                                                                                                       | Yes       |         |
-| --dev                  |                             | Enables settings for local development                                                                                                                                                    | Yes       | false   |
 | --env / -e             | retrieve.env                | Passes environment variables to the workpackage scripts, e.g.: -e "MAX_BUNDLES=5"                                                                                                         | Yes       |         |
 
 #### Example
@@ -134,7 +132,6 @@ the config file. *CLI opts will override config settings.*
 |------------|-----------------|-----------------------------------------------------------------------------------|-----------|---------|
 | --wp       |                 | Workpackage algorithm to execute, e.g. 'wp-1-1-pilot'                             | No        |         | 
 | --version  | analyze.version | Determines which version of the analysis algorithm to use                         | Yes       | latest  |
-| --dev      |                 | Enables settings for local development                                            | Yes       | false   |
 | --env / -e | analyze.env     | Passes environment variables to the workpackage scripts, e.g.: -e "MAX_BUNDLES=5" | Yes       |         |
 
 #### Example
