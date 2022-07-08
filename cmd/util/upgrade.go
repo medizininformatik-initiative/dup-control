@@ -2,8 +2,8 @@ package util
 
 import (
 	"fmt"
-	. "git.smith.care/smith/uc-phep/polar/polarctl/lib/cli"
-	"git.smith.care/smith/uc-phep/polar/polarctl/lib/upgrade"
+	. "git.smith.care/smith/uc-phep/dupctl/lib/cli"
+	"git.smith.care/smith/uc-phep/dupctl/lib/upgrade"
 	"github.com/op/go-logging"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"

@@ -3,8 +3,8 @@
 package test
 
 import (
-	"git.smith.care/smith/uc-phep/polar/polarctl/cmd"
-	. "git.smith.care/smith/uc-phep/polar/polarctl/internal/testing"
+	"git.smith.care/smith/uc-phep/dupctl/cmd"
+	. "git.smith.care/smith/uc-phep/dupctl/internal/testing"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"strings"

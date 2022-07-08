@@ -2,9 +2,9 @@ package run
 
 import (
 	"fmt"
-	. "git.smith.care/smith/uc-phep/polar/polarctl/lib/cli"
-	"git.smith.care/smith/uc-phep/polar/polarctl/lib/coll"
-	"git.smith.care/smith/uc-phep/polar/polarctl/lib/container"
+	. "git.smith.care/smith/uc-phep/dupctl/lib/cli"
+	"git.smith.care/smith/uc-phep/dupctl/lib/coll"
+	"git.smith.care/smith/uc-phep/dupctl/lib/container"
 	docker "github.com/fsouza/go-dockerclient"
 	"github.com/op/go-logging"
 	"github.com/spf13/cobra"

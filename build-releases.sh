@@ -5,8 +5,8 @@ export CGO_ENABLED=0
 
 build() {
   GOOS=${1} GOARCH=${2} go build \
-    -ldflags "-X git.smith.care/smith/uc-phep/polar/polarctl/cmd.Version=${version}" \
-    -o "builds/polarctl-${1}-${2}${3}"
+    -ldflags "-X git.smith.care/smith/uc-phep/dupctl/cmd.Version=${version}" \
+    -o "builds/dupctl-${1}-${2}${3}"
 }
 
 build linux amd64
