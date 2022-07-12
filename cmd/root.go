@@ -97,11 +97,7 @@ type containerRuntimeProvider struct {
 }
 
 func (p *containerRuntimeProvider) CreateRuntime() (*container.Runtime, error) {
-	if viper.GetString("registryUser") == "" {
-		return nil, fmt.Errorf("registryUser not configured. Please check if you are missing the 'config.toml' config file")
-	} else if viper.GetString("registryPass") == "" {
-		return nil, fmt.Errorf("registryPass not configured. Please check if you are missing the 'config.toml' config file")
-	} else if cli, err := docker.NewClientFromEnv(); err != nil {
+	if cli, err := docker.NewClientFromEnv(); err != nil {
 		return nil, fmt.Errorf("cannot instantiate docker client, %w", err)
 	} else {
 		return container.NewRuntime(cli, viper.GetString("registry"), viper.GetString("project"),

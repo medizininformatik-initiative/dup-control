@@ -65,12 +65,10 @@ working directory (cwd) to store results from the executed dups and to find the 
 ### Create dupctl Config
 
 Create a file called `config.toml` within your chosen working directory. The minimal configuration contains the projects 
-container registry, the registry credentials (formerly used with `docker login` command) and a project name in the following form:
+container registry and a project name in the following form:
 ```toml
 project = "some-project"
 registry = "example.com/container-registry"
-registryUser = "<username>"
-registryPass = "<password>"
 ```
 
 *Note: The project name will distinguish docker containers belonging to different projects.*
@@ -143,6 +141,8 @@ dupctl analyze --dup vhf --version "1.0"
 ### Example Configuration
 
 ```toml
+project = "some-project"
+registry = "example.com/container-registry"
 registryUser = "some-dic"
 registryPass = "some-individual-password"
 
