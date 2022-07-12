@@ -14,7 +14,7 @@ import (
 
 func TestAnalyze(t *testing.T) {
 	ForceRemoveImage(d, "registry.gitlab.com/smith-phep/test/dummy-analysis:latest")
-	exeF := RunAsync(cmd.NewRootCmd().Command(), "analyze", "--wp", "dummy")
+	exeF := RunAsync(cmd.NewRootCmd().Command(), "analyze", "--dup", "dummy")
 
 	time.Sleep(10 * time.Second)
 	foundContainer := FindContainerByName(d, "test-analysis-dummy-analysis-latest")
@@ -27,14 +27,14 @@ func TestAnalyze(t *testing.T) {
 
 func TestAnalyzeOfflineFailsWithoutImage(t *testing.T) {
 	ForceRemoveImage(d, "registry.gitlab.com/smith-phep/test/dummy-analysis:latest")
-	exe := Run(cmd.NewRootCmd().Command(), "--offline", "analyze", "--wp", "dummy", "-e", "SLEEP=10")
+	exe := Run(cmd.NewRootCmd().Command(), "--offline", "analyze", "--dup", "dummy", "-e", "SLEEP=10")
 
 	exe.AssertFailure(t)
 	exe.AssertErrContains(t, "no such image")
 }
 
 func TestAnalyzeWritesToOutputLocal(t *testing.T) {
-	exe := Run(cmd.NewRootCmd().Command(), "analyze", "--wp", "dummy", "-e", "SLEEP=0")
+	exe := Run(cmd.NewRootCmd().Command(), "analyze", "--dup", "dummy", "-e", "SLEEP=0")
 
 	doneFile, _ := ioutil.ReadFile("outputLocal/analysis-done")
 
@@ -43,7 +43,7 @@ func TestAnalyzeWritesToOutputLocal(t *testing.T) {
 }
 
 func TestAnalyzeWritesToOutputGlobal(t *testing.T) {
-	exe := Run(cmd.NewRootCmd().Command(), "analyze", "--wp", "dummy", "-e", "SLEEP=0")
+	exe := Run(cmd.NewRootCmd().Command(), "analyze", "--dup", "dummy", "-e", "SLEEP=0")
 
 	doneFile, _ := ioutil.ReadFile("outputGlobal/analysis-done")
 
@@ -52,7 +52,7 @@ func TestAnalyzeWritesToOutputGlobal(t *testing.T) {
 }
 
 func TestAnalyzeRecognizesEnv(t *testing.T) {
-	exe := Run(cmd.NewRootCmd().Command(), "analyze", "--wp", "dummy", "-e", "SLEEP=0", "-e", "FOO=BAR")
+	exe := Run(cmd.NewRootCmd().Command(), "analyze", "--dup", "dummy", "-e", "SLEEP=0", "-e", "FOO=BAR")
 
 	doneFile, _ := ioutil.ReadFile("outputGlobal/analysis-done")
 
@@ -61,7 +61,7 @@ func TestAnalyzeRecognizesEnv(t *testing.T) {
 }
 
 func TestAnalyzeRecognizesVersion(t *testing.T) {
-	exe := Run(cmd.NewRootCmd().Command(), "analyze", "--wp", "dummy", "--version", "absent")
+	exe := Run(cmd.NewRootCmd().Command(), "analyze", "--dup", "dummy", "--version", "absent")
 
 	exe.AssertFailure(t)
 	exe.AssertErrContains(t, "unable to pull image registry.gitlab.com/smith-phep/test/dummy-analysis:absent")

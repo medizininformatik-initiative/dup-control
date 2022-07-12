@@ -60,7 +60,7 @@ curl [link] -O dupctl
 ### Working Directory
 
 Choose a working directory from where you will execute dupctl commands. This is very important, as dupctl uses the current 
-working directory (cwd) to store results from the executed workpackages and to find the dupctl config.  
+working directory (cwd) to store results from the executed dups and to find the dupctl config.  
 
 ### Create dupctl Config
 
@@ -92,7 +92,7 @@ the config file. *CLI opts will override config settings.*
 ### Retrieval
 
 ```shell
-dupctl retrieve --wp <workpackage> --fhir-server-endpoint "https://some-fhir-server" [flags] 
+dupctl retrieve --dup <dup-name> --fhir-server-endpoint "https://some-fhir-server" [flags] 
 ```
 
 #### Settings
@@ -100,27 +100,27 @@ dupctl retrieve --wp <workpackage> --fhir-server-endpoint "https://some-fhir-ser
 Some settings can be set via CLI flag or config file. The table below lists the flags and corresponding keys for 
 the config file. *CLI opts will override config settings.*
 
-| CLI Flag               | Config Key                  | Description                                                                                                                                                                               | Optional? | Default |
-|------------------------|-----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|---------|
-| --wp                   |                             | Workpackage algorithm to execute, e.g. 'wp-1-1-pilot'                                                                                                                                     | No        |         | 
-| --version              | retrieve.version            | Determines which image to use, as images can be versioned or hand-tailored for different dic sites. (e.g. '0.1', dic-giessen', 'dic-leipzig', 'dic-muenchen').                            | Yes       | latest  |
-| --fhir-server-endpoint | retrieve.fhirServerEndpoint | URL including base path of the FHIR Server to be queried, e.g.: 'https://example.com/r4/'                                                                                                 | No        |         |
-| --fhir-server-user     | retrieve.fhirServerUser     | Username for basic auth protected communication with FHIR Server                                                                                                                          | Yes       |         |
-| --fhir-server-pass     | retrieve.fhirServerPass     | Password for basic auth protected communication with FHIR Server                                                                                                                          | Yes       |         |
-| --fhir-server-cacert   | retrieve.fhirServerCACert   | CA Certificate file[^cafile] for https connection to FHIR Server                                                                                                                          | Yes       |         |
-| --fhir-server-token    | retrieve.fhirServerToken    | Token for token based auth protected communication with FHIR Server                                                                                                                       | Yes       |         |
-| --env / -e             | retrieve.env                | Passes environment variables to the workpackage scripts, e.g.: -e "MAX_BUNDLES=5"                                                                                                         | Yes       |         |
+| CLI Flag               | Config Key                  | Description                                                                                                                                                    | Optional? | Default |
+|------------------------|-----------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|---------|
+| --dup                  |                             | DUP to execute, e.g. 'vhf'                                                                                                                                     | No        |         | 
+| --version              | retrieve.version            | Determines which image to use, as images can be versioned or hand-tailored for different dic sites. (e.g. '0.1', dic-giessen', 'dic-leipzig', 'dic-muenchen'). | Yes       | latest  |
+| --fhir-server-endpoint | retrieve.fhirServerEndpoint | URL including base path of the FHIR Server to be queried, e.g.: 'https://example.com/r4/'                                                                      | No        |         |
+| --fhir-server-user     | retrieve.fhirServerUser     | Username for basic auth protected communication with FHIR Server                                                                                               | Yes       |         |
+| --fhir-server-pass     | retrieve.fhirServerPass     | Password for basic auth protected communication with FHIR Server                                                                                               | Yes       |         |
+| --fhir-server-cacert   | retrieve.fhirServerCACert   | CA Certificate file[^cafile] for https connection to FHIR Server                                                                                               | Yes       |         |
+| --fhir-server-token    | retrieve.fhirServerToken    | Token for token based auth protected communication with FHIR Server                                                                                            | Yes       |         |
+| --env / -e             | retrieve.env                | Passes environment variables to the dup scripts, e.g.: -e "MAX_BUNDLES=5"                                                                                      | Yes       |         |
 
 #### Example
 
 ```shell
-dupctl retrieve --wp wp-1-1-pilot --fhir-server-endpoint "https://mii-agiop-3p.life.uni-leipzig.de/fhir/"
+dupctl retrieve --dup vhf --fhir-server-endpoint "https://mii-agiop-3p.life.uni-leipzig.de/fhir/"
 ```
 
 ### Analysis
 
 ```shell
-dupctl analyze --wp <workpackage> [flags] 
+dupctl analyze --dup <dup-name> [flags] 
 ```
 
 #### Settings
@@ -128,16 +128,16 @@ dupctl analyze --wp <workpackage> [flags]
 Some settings can be set via CLI flag or config file. The table below lists the flags and corresponding keys for
 the config file. *CLI opts will override config settings.*
 
-| CLI Flag   | Config Key      | Description                                                                       | Optional? | Default |
-|------------|-----------------|-----------------------------------------------------------------------------------|-----------|---------|
-| --wp       |                 | Workpackage algorithm to execute, e.g. 'wp-1-1-pilot'                             | No        |         | 
-| --version  | analyze.version | Determines which version of the analysis algorithm to use                         | Yes       | latest  |
-| --env / -e | analyze.env     | Passes environment variables to the workpackage scripts, e.g.: -e "MAX_BUNDLES=5" | Yes       |         |
+| CLI Flag   | Config Key      | Description                                                               | Optional? | Default |
+|------------|-----------------|---------------------------------------------------------------------------|-----------|---------|
+| --dup      |                 | DUP to execute, e.g. 'vhf'                                                | No        |         | 
+| --version  | analyze.version | Determines which version of the analysis algorithm to use                 | Yes       | latest  |
+| --env / -e | analyze.env     | Passes environment variables to the dup scripts, e.g.: -e "MAX_BUNDLES=5" | Yes       |         |
 
 #### Example
 
 ```shell
-dupctl analyze --wp wp-1-1-pilot --version "1.0"
+dupctl analyze --dup vhf --version "1.0"
 ```
 
 ### Example Configuration

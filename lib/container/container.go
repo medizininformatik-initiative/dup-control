@@ -38,16 +38,16 @@ func NewRuntime(client DockerClient, registry string, namespace string, registry
 	}
 }
 
-func (runtime *Runtime) sprintRepositoryName(workpackage string) string {
-	return fmt.Sprintf("%s/%s", runtime.registry, workpackage)
+func (runtime *Runtime) sprintRepositoryName(dup string) string {
+	return fmt.Sprintf("%s/%s", runtime.registry, dup)
 }
 
-func (runtime *Runtime) sprintImageName(workpackage string, site string) string {
-	return fmt.Sprintf("%s:%s", runtime.sprintRepositoryName(workpackage), site)
+func (runtime *Runtime) sprintImageName(dup string, site string) string {
+	return fmt.Sprintf("%s:%s", runtime.sprintRepositoryName(dup), site)
 }
 
-func (runtime *Runtime) sprintContainerName(prefix string, workpackage string, site string) string {
-	return fmt.Sprintf("%s-%s-%s-%s", runtime.namespace, prefix, workpackage, site)
+func (runtime *Runtime) sprintContainerName(prefix string, dup string, site string) string {
+	return fmt.Sprintf("%s-%s-%s-%s", runtime.namespace, prefix, dup, site)
 }
 
 type PullOpts struct {

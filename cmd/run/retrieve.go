@@ -15,7 +15,7 @@ import (
 )
 
 type retrieveOpts struct {
-	workpackage        string //req
+	dup                string //req
 	version            string //req
 	fhirServerEndpoint string
 	fhirServerUser     string
@@ -39,7 +39,7 @@ func NewRetrieveCommand(log *logging.Logger, crp container.RuntimeProvider) *ret
 
 func (c *retrieveCommand) createRetrieveOpts(retrieveOpts retrieveOpts) (container.PullOpts, container.RunOpts) {
 	pullOpts := container.PullOpts{
-		Image: retrieveOpts.workpackage,
+		Image: retrieveOpts.dup,
 		Tag:   retrieveOpts.version,
 	}
 	runOpts := container.RunOpts{
@@ -120,8 +120,8 @@ func (c *retrieveCommand) Command() *cobra.Command {
 		},
 	}
 
-	command.PersistentFlags().StringVar(&c.retrieveOpts.workpackage, "wp", "", "Image to execute (e.g. 'wp-1-1-pilot').")
-	_ = command.MarkPersistentFlagRequired("wp")
+	command.PersistentFlags().StringVar(&c.retrieveOpts.dup, "dup", "", "Image to execute (e.g. 'vhf').")
+	_ = command.MarkPersistentFlagRequired("dup")
 
 	command.PersistentFlags().String("version", "latest", "Determines which image to use, as images can be versioned or hand-tailored for different dic sites. (e.g. '0.1', 'dic-giessen', 'dic-leipzig', 'dic-muenchen').")
 	_ = viper.BindPFlag("retrieve.version", command.PersistentFlags().Lookup("version"))

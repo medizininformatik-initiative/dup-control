@@ -14,7 +14,7 @@ import (
 
 func TestRetrieve(t *testing.T) {
 	ForceRemoveImage(d, "registry.gitlab.com/smith-phep/test/dummy:latest")
-	exeF := RunAsync(cmd.NewRootCmd().Command(), "retrieve", "--wp", "dummy")
+	exeF := RunAsync(cmd.NewRootCmd().Command(), "retrieve", "--dup", "dummy")
 
 	time.Sleep(10 * time.Second)
 	foundContainer := FindContainerByName(d, "test-retrieval-dummy-latest")
@@ -27,14 +27,14 @@ func TestRetrieve(t *testing.T) {
 
 func TestRetrieveOfflineFailsWithoutImage(t *testing.T) {
 	ForceRemoveImage(d, "registry.gitlab.com/smith-phep/test/dummy:latest")
-	exe := Run(cmd.NewRootCmd().Command(), "--offline", "retrieve", "--wp", "dummy", "-e", "SLEEP=10")
+	exe := Run(cmd.NewRootCmd().Command(), "--offline", "retrieve", "--dup", "dummy", "-e", "SLEEP=10")
 
 	exe.AssertFailure(t)
 	exe.AssertErrContains(t, "no such image")
 }
 
 func TestRetrieveWritesToOutputLocal(t *testing.T) {
-	exe := Run(cmd.NewRootCmd().Command(), "retrieve", "--wp", "dummy", "-e", "SLEEP=0")
+	exe := Run(cmd.NewRootCmd().Command(), "retrieve", "--dup", "dummy", "-e", "SLEEP=0")
 
 	doneFile, _ := ioutil.ReadFile("outputLocal/retrieval-done")
 
@@ -43,7 +43,7 @@ func TestRetrieveWritesToOutputLocal(t *testing.T) {
 }
 
 func TestRetrieveWritesToOutputGlobal(t *testing.T) {
-	exe := Run(cmd.NewRootCmd().Command(), "retrieve", "--wp", "dummy", "-e", "SLEEP=0")
+	exe := Run(cmd.NewRootCmd().Command(), "retrieve", "--dup", "dummy", "-e", "SLEEP=0")
 
 	doneFile, _ := ioutil.ReadFile("outputGlobal/retrieval-done")
 
@@ -52,7 +52,7 @@ func TestRetrieveWritesToOutputGlobal(t *testing.T) {
 }
 
 func TestRetrieveRecognizesEnv(t *testing.T) {
-	exe := Run(cmd.NewRootCmd().Command(), "retrieve", "--wp", "dummy", "-e", "SLEEP=0", "-e", "FOO=BAR")
+	exe := Run(cmd.NewRootCmd().Command(), "retrieve", "--dup", "dummy", "-e", "SLEEP=0", "-e", "FOO=BAR")
 
 	doneFile, _ := ioutil.ReadFile("outputGlobal/retrieval-done")
 
@@ -61,7 +61,7 @@ func TestRetrieveRecognizesEnv(t *testing.T) {
 }
 
 func TestRetrieveRecognizesVersion(t *testing.T) {
-	exe := Run(cmd.NewRootCmd().Command(), "retrieve", "--wp", "dummy", "--version", "absent")
+	exe := Run(cmd.NewRootCmd().Command(), "retrieve", "--dup", "dummy", "--version", "absent")
 
 	exe.AssertFailure(t)
 	exe.AssertErrContains(t, "unable to pull image registry.gitlab.com/smith-phep/test/dummy:absent")

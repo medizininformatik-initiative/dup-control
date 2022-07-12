@@ -14,10 +14,10 @@ import (
 )
 
 type analyzeOpts struct {
-	workpackage string //req
-	version     string
-	dev         bool
-	env         map[string]string
+	dup     string //req
+	version string
+	dev     bool
+	env     map[string]string
 }
 
 type analyzeCommand struct {
@@ -33,7 +33,7 @@ func NewAnalyzeCommand(log *logging.Logger, crp container.RuntimeProvider) *anal
 
 func (c *analyzeCommand) createAnalyseOpts(analyzeOpts analyzeOpts) (container.PullOpts, container.RunOpts) {
 	pullOpts := container.PullOpts{
-		Image: fmt.Sprintf("%s-analysis", analyzeOpts.workpackage),
+		Image: fmt.Sprintf("%s-analysis", analyzeOpts.dup),
 		Tag:   analyzeOpts.version,
 	}
 	runOpts := container.RunOpts{
@@ -82,8 +82,8 @@ func (c *analyzeCommand) Command() *cobra.Command {
 		},
 	}
 
-	command.PersistentFlags().StringVar(&c.analyzeOpts.workpackage, "wp", "", "Image to execute (e.g. 'wp-1-1-pilot').")
-	_ = command.MarkPersistentFlagRequired("wp")
+	command.PersistentFlags().StringVar(&c.analyzeOpts.dup, "dup", "", "Image to execute (e.g. 'vhf').")
+	_ = command.MarkPersistentFlagRequired("dup")
 
 	command.PersistentFlags().String("version", "latest", "Determines which image version to use.")
 	_ = viper.BindPFlag("analyze.version", command.PersistentFlags().Lookup("version"))
