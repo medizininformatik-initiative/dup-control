@@ -107,7 +107,7 @@ the config file. *CLI opts will override config settings.*
 | --fhir-server-pass     | retrieve.fhirServerPass     | Password for basic auth protected communication with FHIR Server                                                                                               | Yes       |         |
 | --fhir-server-cacert   | retrieve.fhirServerCACert   | CA Certificate file[^cafile] for https connection to FHIR Server                                                                                               | Yes       |         |
 | --fhir-server-token    | retrieve.fhirServerToken    | Token for token based auth protected communication with FHIR Server                                                                                            | Yes       |         |
-| --env / -e             | retrieve.env                | Passes environment variables to the dup scripts, e.g.: -e "MAX_BUNDLES=5"                                                                                      | Yes       |         |
+| --env / -e             | retrieve.env                | Passes environment variables to the dup scripts, e.g.: -e "MAX_BUNDLES=5", all variable names will be converted to [UPPERCASE][go-upper]                       | Yes       |         |
 
 #### Example
 
@@ -126,11 +126,11 @@ dupctl analyze --dup <dup-name> [flags]
 Some settings can be set via CLI flag or config file. The table below lists the flags and corresponding keys for
 the config file. *CLI opts will override config settings.*
 
-| CLI Flag   | Config Key      | Description                                                               | Optional? | Default |
-|------------|-----------------|---------------------------------------------------------------------------|-----------|---------|
-| --dup      |                 | DUP to execute, e.g. 'vhf'                                                | No        |         | 
-| --version  | analyze.version | Determines which version of the analysis algorithm to use                 | Yes       | latest  |
-| --env / -e | analyze.env     | Passes environment variables to the dup scripts, e.g.: -e "MAX_BUNDLES=5" | Yes       |         |
+| CLI Flag   | Config Key      | Description                                                                                                                              | Optional? | Default |
+|------------|-----------------|------------------------------------------------------------------------------------------------------------------------------------------|-----------|---------|
+| --dup      |                 | DUP to execute, e.g. 'vhf'                                                                                                               | No        |         | 
+| --version  | analyze.version | Determines which version of the analysis algorithm to use                                                                                | Yes       | latest  |
+| --env / -e | analyze.env     | Passes environment variables to the dup scripts, e.g.: -e "MAX_BUNDLES=5", all variable names will be converted to [UPPERCASE][go-upper] | Yes       |         |
 
 #### Example
 
@@ -172,3 +172,5 @@ currently installed dupctl file. On linux using `sudo dupctl upgrade` should suf
 [linux-arm64]: https://dupctl.s3.amazonaws.com/dupctl-linux-arm64
 [darwin-amd64]: https://dupctl.s3.amazonaws.com/dupctl-darwin-amd64
 [darwin-arm64]: https://dupctl.s3.amazonaws.com/dupctl-darwin-arm64
+
+[go-upper]: https://pkg.go.dev/strings#ToUpper
