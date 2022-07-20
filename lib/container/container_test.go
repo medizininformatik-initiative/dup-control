@@ -158,7 +158,7 @@ func TestRunWithLogError(t *testing.T) {
 	dockerMock.On("ListContainers",
 		mockListOpts{Filters: map[string][]string{"id": {id}}}).Return([]docker.APIContainers{{ID: id}}, nil)
 	dockerMock.On("StopContainer",
-		id, uint(10)).Return(nil)
+		id, uint(0)).Return(nil)
 
 	err := runtime.Run("prefix",
 		PullOpts{Image: "wp-0", Tag: dic},

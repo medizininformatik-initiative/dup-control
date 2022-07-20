@@ -146,7 +146,7 @@ func (runtime *Runtime) registerInterruptTermination(container *docker.Container
 }
 
 func (runtime *Runtime) terminate(container *docker.Container) {
-	if err := runtime.client.StopContainer(container.ID, 10); err != nil {
+	if err := runtime.client.StopContainer(container.ID, 0); err != nil {
 		log.Errorf("Unable to stop container %s, %v", container.Name, err)
 	}
 }
