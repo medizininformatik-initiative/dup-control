@@ -12,6 +12,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 )
 
 type retrieveOpts struct {
@@ -94,7 +95,7 @@ func (c *retrieveCommand) Command() *cobra.Command {
 			c.retrieveOpts.fhirServerPass = viper.GetString("retrieve.fhirServerPass")
 			c.retrieveOpts.fhirServerCACert = viper.GetString("retrieve.fhirServerCACert")
 			c.retrieveOpts.fhirServerToken = viper.GetString("retrieve.fhirServerToken")
-			c.retrieveOpts.env = viper.GetStringMapString("retrieve.env")
+			c.retrieveOpts.env = coll.TransformKeys(viper.GetStringMapString("retrieve.env"), strings.ToUpper)
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {

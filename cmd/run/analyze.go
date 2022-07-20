@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/viper"
 	"os"
 	"runtime"
+	"strings"
 )
 
 type analyzeOpts struct {
@@ -57,7 +58,7 @@ func (c *analyzeCommand) Command() *cobra.Command {
 		Long:  "You can analyze bundles that have formerly been retrieved from the FHIR server for a specific dup",
 		PreRun: func(cmd *cobra.Command, args []string) {
 			c.analyzeOpts.version = viper.GetString("analyze.version")
-			c.analyzeOpts.env = viper.GetStringMapString("analyze.env")
+			c.analyzeOpts.env = coll.TransformKeys(viper.GetStringMapString("analyze.env"), strings.ToUpper)
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			containerRuntime, err := c.crp.CreateRuntime()
