@@ -49,6 +49,16 @@ func (mock *mockClient) Logs(opts docker.LogsOptions) error {
 	return args.Error(0)
 }
 
+type mockListOpts struct {
+	Filters map[string][]string
+}
+
+func (mock *mockClient) ListContainers(opts docker.ListContainersOptions) ([]docker.APIContainers, error) {
+	mockOpts := mockListOpts{Filters: opts.Filters}
+	args := mock.Called(mockOpts)
+	return args.Get(0).([]docker.APIContainers), args.Error(1)
+}
+
 const registry = "registry.gitlab.com/some-registry"
 const namespace = "test"
 const pass = "some-pass"
@@ -89,8 +99,8 @@ func TestRun(t *testing.T) {
 		id, mock.Anything, mock.Anything).Return(nil)
 	dockerMock.On("Logs",
 		mockLogOpts{Container: id, Follow: true}).Return(nil)
-	dockerMock.On("StopContainer",
-		id, uint(10), mock.Anything).Return(nil)
+	dockerMock.On("ListContainers",
+		mockListOpts{Filters: map[string][]string{"id": {id}}}).Return([]docker.APIContainers{}, nil)
 
 	_ = runtime.Run("prefix",
 		PullOpts{Image: "wp-0", Tag: dic},
@@ -123,8 +133,8 @@ func TestRunWithStartError(t *testing.T) {
 		mock.Anything).Return(&docker.Container{ID: id}, nil)
 	dockerMock.On("StartContainer",
 		id, mock.Anything, mock.Anything).Return(errors.New("unable to start container"))
-	dockerMock.On("StopContainer",
-		id, uint(10), mock.Anything).Return(nil)
+	dockerMock.On("ListContainers",
+		mockListOpts{Filters: map[string][]string{"id": {id}}}).Return([]docker.APIContainers{}, nil)
 
 	err := runtime.Run("prefix",
 		PullOpts{Image: "wp-0", Tag: dic},
@@ -145,8 +155,10 @@ func TestRunWithLogError(t *testing.T) {
 		id, mock.Anything, mock.Anything).Return(nil)
 	dockerMock.On("Logs",
 		mockLogOpts{Container: id, Follow: true}).Return(errors.New("unable to get container logs"))
+	dockerMock.On("ListContainers",
+		mockListOpts{Filters: map[string][]string{"id": {id}}}).Return([]docker.APIContainers{{ID: id}}, nil)
 	dockerMock.On("StopContainer",
-		id, uint(10), mock.Anything).Return(nil)
+		id, uint(10)).Return(nil)
 
 	err := runtime.Run("prefix",
 		PullOpts{Image: "wp-0", Tag: dic},
