@@ -73,9 +73,6 @@ registry = "example.com/container-registry"
 
 *Note: The project name will distinguish docker containers belonging to different projects.*
 
-*Note: Container Registry Credentials are provided per DIC by the UC PheP Development Team. Please contact
-[Jonas Wagner](mailto:jwagner@life.uni-leipzig.de) or [Frank Meineke](mailto:Frank.Meineke@imise.uni-leipzig.de).*
-
 ### Global Settings
 
 Some settings can be set via CLI flag or config file. The table below lists the flags and corresponding keys for
@@ -141,10 +138,8 @@ dupctl analyze --dup vhf --version "1.0"
 ### Example Configuration
 
 ```toml
-project = "some-project"
-registry = "example.com/container-registry"
-registryUser = "some-dic"
-registryPass = "some-individual-password"
+project = "smith-phep"
+registry = "registry.gitlab.com/smith-phep/dup"
 
 [retrieve]
 fhirServerEndpoint = "https://example.com/fhir"
