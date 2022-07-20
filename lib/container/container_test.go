@@ -1,7 +1,6 @@
 package container
 
 import (
-	"context"
 	"errors"
 	docker "github.com/fsouza/go-dockerclient"
 	"github.com/stretchr/testify/assert"
@@ -29,13 +28,13 @@ func (mock *mockClient) CreateContainer(opts docker.CreateContainerOptions) (*do
 	return args.Get(0).(*docker.Container), args.Error(1)
 }
 
-func (mock *mockClient) StartContainerWithContext(id string, hostConfig *docker.HostConfig, ctx context.Context) error {
-	args := mock.Called(id, hostConfig, ctx)
+func (mock *mockClient) StartContainer(id string, hostConfig *docker.HostConfig) error {
+	args := mock.Called(id, hostConfig)
 	return args.Error(0)
 }
 
-func (mock *mockClient) StopContainerWithContext(id string, timeout uint, ctx context.Context) error {
-	args := mock.Called(id, timeout, ctx)
+func (mock *mockClient) StopContainer(id string, timeout uint) error {
+	args := mock.Called(id, timeout)
 	return args.Error(0)
 }
 
@@ -86,11 +85,11 @@ func TestRun(t *testing.T) {
 
 	dockerMock.On("CreateContainer",
 		mock.Anything).Return(&docker.Container{ID: id}, nil)
-	dockerMock.On("StartContainerWithContext",
+	dockerMock.On("StartContainer",
 		id, mock.Anything, mock.Anything).Return(nil)
 	dockerMock.On("Logs",
 		mockLogOpts{Container: id, Follow: true}).Return(nil)
-	dockerMock.On("StopContainerWithContext",
+	dockerMock.On("StopContainer",
 		id, uint(10), mock.Anything).Return(nil)
 
 	_ = runtime.Run("prefix",
@@ -122,9 +121,9 @@ func TestRunWithStartError(t *testing.T) {
 
 	dockerMock.On("CreateContainer",
 		mock.Anything).Return(&docker.Container{ID: id}, nil)
-	dockerMock.On("StartContainerWithContext",
+	dockerMock.On("StartContainer",
 		id, mock.Anything, mock.Anything).Return(errors.New("unable to start container"))
-	dockerMock.On("StopContainerWithContext",
+	dockerMock.On("StopContainer",
 		id, uint(10), mock.Anything).Return(nil)
 
 	err := runtime.Run("prefix",
@@ -142,11 +141,11 @@ func TestRunWithLogError(t *testing.T) {
 
 	dockerMock.On("CreateContainer",
 		mock.Anything).Return(&docker.Container{ID: id}, nil)
-	dockerMock.On("StartContainerWithContext",
+	dockerMock.On("StartContainer",
 		id, mock.Anything, mock.Anything).Return(nil)
 	dockerMock.On("Logs",
 		mockLogOpts{Container: id, Follow: true}).Return(errors.New("unable to get container logs"))
-	dockerMock.On("StopContainerWithContext",
+	dockerMock.On("StopContainer",
 		id, uint(10), mock.Anything).Return(nil)
 
 	err := runtime.Run("prefix",

@@ -15,9 +15,9 @@ var log = logging.MustGetLogger("util.container")
 type DockerClient interface {
 	PullImage(opts docker.PullImageOptions, auth docker.AuthConfiguration) error
 	CreateContainer(opts docker.CreateContainerOptions) (*docker.Container, error)
-	StartContainerWithContext(id string, hostConfig *docker.HostConfig, ctx context.Context) error
+	StartContainer(id string, hostConfig *docker.HostConfig) error
 	Logs(opts docker.LogsOptions) error
-	StopContainerWithContext(id string, timeout uint, ctx context.Context) error
+	StopContainer(id string, timeout uint) error
 }
 
 type Runtime struct {
@@ -103,7 +103,7 @@ func (runtime *Runtime) Run(containerNamePrefix string, pullOpts PullOpts, runOp
 	if err == nil {
 		defer runtime.terminate(container)
 		runtime.registerInterruptTermination(container)
-		err = runtime.client.StartContainerWithContext(container.ID, nil, runtime.context)
+		err = runtime.client.StartContainer(container.ID, nil)
 	}
 
 	if err == nil {
@@ -137,7 +137,7 @@ func (runtime *Runtime) registerInterruptTermination(container *docker.Container
 }
 
 func (runtime *Runtime) terminate(container *docker.Container) {
-	if err := runtime.client.StopContainerWithContext(container.ID, 10, runtime.context); err != nil {
+	if err := runtime.client.StopContainer(container.ID, 10); err != nil {
 		log.Errorf("Unable to stop container %s, %v", container.Name, err)
 	}
 }
