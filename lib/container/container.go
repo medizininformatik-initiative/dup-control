@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"time"
 )
 
 var log = logging.MustGetLogger("util.container")
@@ -15,9 +16,10 @@ var log = logging.MustGetLogger("util.container")
 type DockerClient interface {
 	PullImage(opts docker.PullImageOptions, auth docker.AuthConfiguration) error
 	CreateContainer(opts docker.CreateContainerOptions) (*docker.Container, error)
-	StartContainerWithContext(id string, hostConfig *docker.HostConfig, ctx context.Context) error
+	StartContainer(id string, hostConfig *docker.HostConfig) error
 	Logs(opts docker.LogsOptions) error
-	StopContainerWithContext(id string, timeout uint, ctx context.Context) error
+	StopContainer(id string, timeout uint) error
+	ListContainers(opts docker.ListContainersOptions) ([]docker.APIContainers, error)
 }
 
 type Runtime struct {
@@ -101,9 +103,9 @@ func (runtime *Runtime) Run(containerNamePrefix string, pullOpts PullOpts, runOp
 	}
 	container, err := runtime.client.CreateContainer(containerOpts)
 	if err == nil {
-		defer runtime.terminate(container)
+		defer runtime.terminateIfRunning(container, 500*time.Millisecond)
 		runtime.registerInterruptTermination(container)
-		err = runtime.client.StartContainerWithContext(container.ID, nil, runtime.context)
+		err = runtime.client.StartContainer(container.ID, nil)
 	}
 
 	if err == nil {
@@ -125,20 +127,38 @@ func (runtime *Runtime) Run(containerNamePrefix string, pullOpts PullOpts, runOp
 	}
 }
 
+func (runtime *Runtime) terminateIfRunning(container *docker.Container, wait time.Duration) {
+	time.Sleep(wait)
+	if runtime.isContainerRunning(container) {
+		runtime.terminate(container)
+	}
+}
+
 func (runtime *Runtime) registerInterruptTermination(container *docker.Container) {
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 	go func() {
 		<-c
 		log.Infof("Interrupted. Terminating container %s", container.Name)
-		runtime.terminate(container)
+		runtime.terminateIfRunning(container, 0)
 		os.Exit(130)
 	}()
 }
 
 func (runtime *Runtime) terminate(container *docker.Container) {
-	if err := runtime.client.StopContainerWithContext(container.ID, 10, runtime.context); err != nil {
+	if err := runtime.client.StopContainer(container.ID, 0); err != nil {
 		log.Errorf("Unable to stop container %s, %v", container.Name, err)
+	}
+}
+
+func (runtime *Runtime) isContainerRunning(container *docker.Container) bool {
+	if list, err := runtime.client.ListContainers(docker.ListContainersOptions{
+		Filters: map[string][]string{"id": {container.ID}},
+	}); err != nil {
+		log.Errorf("Unable to list containers %v", err)
+		return false
+	} else {
+		return len(list) > 0
 	}
 }
 

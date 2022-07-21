@@ -1,7 +1,6 @@
 package container
 
 import (
-	"context"
 	"errors"
 	docker "github.com/fsouza/go-dockerclient"
 	"github.com/stretchr/testify/assert"
@@ -29,13 +28,13 @@ func (mock *mockClient) CreateContainer(opts docker.CreateContainerOptions) (*do
 	return args.Get(0).(*docker.Container), args.Error(1)
 }
 
-func (mock *mockClient) StartContainerWithContext(id string, hostConfig *docker.HostConfig, ctx context.Context) error {
-	args := mock.Called(id, hostConfig, ctx)
+func (mock *mockClient) StartContainer(id string, hostConfig *docker.HostConfig) error {
+	args := mock.Called(id, hostConfig)
 	return args.Error(0)
 }
 
-func (mock *mockClient) StopContainerWithContext(id string, timeout uint, ctx context.Context) error {
-	args := mock.Called(id, timeout, ctx)
+func (mock *mockClient) StopContainer(id string, timeout uint) error {
+	args := mock.Called(id, timeout)
 	return args.Error(0)
 }
 
@@ -48,6 +47,16 @@ func (mock *mockClient) Logs(opts docker.LogsOptions) error {
 	mockOpts := mockLogOpts{Container: opts.Container, Follow: opts.Follow}
 	args := mock.Called(mockOpts)
 	return args.Error(0)
+}
+
+type mockListOpts struct {
+	Filters map[string][]string
+}
+
+func (mock *mockClient) ListContainers(opts docker.ListContainersOptions) ([]docker.APIContainers, error) {
+	mockOpts := mockListOpts{Filters: opts.Filters}
+	args := mock.Called(mockOpts)
+	return args.Get(0).([]docker.APIContainers), args.Error(1)
 }
 
 const registry = "registry.gitlab.com/some-registry"
@@ -86,12 +95,12 @@ func TestRun(t *testing.T) {
 
 	dockerMock.On("CreateContainer",
 		mock.Anything).Return(&docker.Container{ID: id}, nil)
-	dockerMock.On("StartContainerWithContext",
+	dockerMock.On("StartContainer",
 		id, mock.Anything, mock.Anything).Return(nil)
 	dockerMock.On("Logs",
 		mockLogOpts{Container: id, Follow: true}).Return(nil)
-	dockerMock.On("StopContainerWithContext",
-		id, uint(10), mock.Anything).Return(nil)
+	dockerMock.On("ListContainers",
+		mockListOpts{Filters: map[string][]string{"id": {id}}}).Return([]docker.APIContainers{}, nil)
 
 	_ = runtime.Run("prefix",
 		PullOpts{Image: "wp-0", Tag: dic},
@@ -122,10 +131,10 @@ func TestRunWithStartError(t *testing.T) {
 
 	dockerMock.On("CreateContainer",
 		mock.Anything).Return(&docker.Container{ID: id}, nil)
-	dockerMock.On("StartContainerWithContext",
+	dockerMock.On("StartContainer",
 		id, mock.Anything, mock.Anything).Return(errors.New("unable to start container"))
-	dockerMock.On("StopContainerWithContext",
-		id, uint(10), mock.Anything).Return(nil)
+	dockerMock.On("ListContainers",
+		mockListOpts{Filters: map[string][]string{"id": {id}}}).Return([]docker.APIContainers{}, nil)
 
 	err := runtime.Run("prefix",
 		PullOpts{Image: "wp-0", Tag: dic},
@@ -142,12 +151,14 @@ func TestRunWithLogError(t *testing.T) {
 
 	dockerMock.On("CreateContainer",
 		mock.Anything).Return(&docker.Container{ID: id}, nil)
-	dockerMock.On("StartContainerWithContext",
+	dockerMock.On("StartContainer",
 		id, mock.Anything, mock.Anything).Return(nil)
 	dockerMock.On("Logs",
 		mockLogOpts{Container: id, Follow: true}).Return(errors.New("unable to get container logs"))
-	dockerMock.On("StopContainerWithContext",
-		id, uint(10), mock.Anything).Return(nil)
+	dockerMock.On("ListContainers",
+		mockListOpts{Filters: map[string][]string{"id": {id}}}).Return([]docker.APIContainers{{ID: id}}, nil)
+	dockerMock.On("StopContainer",
+		id, uint(0)).Return(nil)
 
 	err := runtime.Run("prefix",
 		PullOpts{Image: "wp-0", Tag: dic},
