@@ -3,7 +3,7 @@
 aws s3 cp "builds/VERSION" s3://dupctl/
 
 deploy() {
-  aws s3 cp "builds/dupctl-${1}-${2}${3}" s3://dupctl/ --content-disposition "attachment; filename=\"dupctl${3}\""
+  aws s3 cp "builds/dupctl-${1}-${2}${3}" s3://dupctl/ --content-disposition "attachment; filename=\"dupctl${3}\"" --cache-control "no-cache"
 }
 
 deploy linux amd64
