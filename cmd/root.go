@@ -104,7 +104,11 @@ func (p *containerRuntimeProvider) CreateRuntime() (*container.Runtime, error) {
 	} else if cli, err := docker.NewClientFromEnv(); err != nil {
 		return nil, fmt.Errorf("cannot instantiate docker client, %w", err)
 	} else {
-		return container.NewRuntime(cli, viper.GetString("registry"), viper.GetString("project"),
-			viper.GetString("registryUser"), viper.GetString("registryPass")), nil
+		if err := cli.Ping(); err != nil {
+			return nil, fmt.Errorf("docker daemon not reachable. Pleas check if Docker or Docker Desktop is installed")
+		} else {
+			return container.NewRuntime(cli, viper.GetString("registry"), viper.GetString("project"),
+				viper.GetString("registryUser"), viper.GetString("registryPass")), nil
+		}
 	}
 }
